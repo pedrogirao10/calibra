@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calibra — Bet on Edge</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:#0a0a0a;color:#f0ede8;overflow-x:hidden}
+.noise{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");opacity:0.5}
+.wrap{max-width:800px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+nav{display:flex;align-items:center;justify-content:space-between;padding:32px 0 0;gap:12px}
+.logo{font-family:'DM Serif Display',serif;font-size:26px;letter-spacing:-0.4px;flex-shrink:0}
+.logo span{color:#c8f55a}
+.nav-right{display:flex;align-items:center;gap:12px}
+.lang-select{background:#111;border:1px solid #1e1e1e;color:#888;font-family:'DM Mono',monospace;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;outline:none;transition:all 0.2s}
+.lang-select:hover{border-color:#333;color:#f0ede8}
+.lang-select option{background:#111}
+.lang-auto-badge{font-family:'DM Mono',monospace;font-size:9px;color:#3a5a10;background:#0d1a00;border:1px solid #2a4010;padding:2px 8px;border-radius:20px;letter-spacing:0.08em;white-space:nowrap}
+.btn-nav{font-size:13px;font-family:'Outfit',sans-serif;background:#c8f55a;color:#0a0a0a;border:none;padding:8px 18px;border-radius:8px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.btn-nav:hover{background:#d4f870}
+.hero{padding:100px 0 80px;text-align:center}
+.hero-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;color:#5a8a20;background:#0d1a00;border:1px solid #2a4010;padding:5px 14px;border-radius:20px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:32px}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(38px,6vw,68px);line-height:1.05;letter-spacing:-2px;margin-bottom:24px}
+.hero h1 em{font-style:italic;color:#c8f55a}
+.hero h1 .muted{color:#333}
+.hero-sub{font-size:17px;color:#666;font-weight:300;line-height:1.7;max-width:480px;margin:0 auto 48px}
+.hero-ctas{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.btn-primary{padding:14px 32px;background:#c8f55a;color:#0a0a0a;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.btn-primary:hover{background:#d4f870;transform:translateY(-1px)}
+.btn-ghost{padding:14px 32px;background:transparent;color:#555;border:1px solid #222;border-radius:10px;font-family:'Outfit',sans-serif;font-size:15px;cursor:pointer;transition:all 0.2s}
+.btn-ghost:hover{color:#f0ede8;border-color:#444}
+.hero-note{font-family:'DM Mono',monospace;font-size:11px;color:#333;margin-top:20px;letter-spacing:0.05em}
+.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#1a1a1a;border:1px solid #1a1a1a;border-radius:14px;overflow:hidden;margin:80px 0}
+.stat{background:#0f0f0f;padding:28px 24px;text-align:center}
+.stat-val{font-family:'DM Serif Display',serif;font-size:36px;color:#c8f55a;letter-spacing:-1px;margin-bottom:6px}
+.stat-label{font-family:'DM Mono',monospace;font-size:11px;color:#444;text-transform:uppercase;letter-spacing:0.08em}
+.section{padding:80px 0}
+.section-tag{font-family:'DM Mono',monospace;font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:16px}
+.section h2{font-family:'DM Serif Display',serif;font-size:clamp(28px,4vw,42px);letter-spacing:-1px;line-height:1.1;margin-bottom:16px}
+.section h2 em{font-style:italic;color:#c8f55a}
+.section-sub{font-size:15px;color:#555;font-weight:300;line-height:1.7;max-width:460px;margin-bottom:48px}
+.modules{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.module{background:#111;border:1px solid #1e1e1e;border-radius:16px;padding:28px;position:relative}
+.module.premium{border-color:#2a3a10;background:#0d1500}
+.module-tag{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;color:#444}
+.module.premium .module-tag{color:#5a8a20}
+.module-icon{width:40px;height:40px;border-radius:10px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:18px}
+.module.premium .module-icon{background:#1a2a00}
+.module h3{font-size:18px;font-weight:500;margin-bottom:10px;letter-spacing:-0.3px}
+.module p{font-size:13px;color:#555;line-height:1.7}
+.module.premium p{color:#5a7a30}
+.module-badge{position:absolute;top:20px;right:20px;font-family:'DM Mono',monospace;font-size:10px;background:#c8f55a;color:#0a0a0a;padding:3px 10px;border-radius:20px;font-weight:500}
+.module-note{margin-top:16px;padding-top:14px;border-top:1px solid #1a1a1a;font-family:'DM Mono',monospace;font-size:11px;color:#333;line-height:1.6}
+.module-note strong{color:#444}
+.how{display:flex;flex-direction:column}
+.step{display:grid;grid-template-columns:48px 1fr;gap:20px;padding:28px 0;border-bottom:1px solid #111}
+.step:last-child{border-bottom:none}
+.step-num{width:40px;height:40px;border-radius:50%;background:#111;border:1px solid #1e1e1e;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:13px;color:#444;flex-shrink:0;margin-top:4px}
+.step h4{font-size:16px;font-weight:500;margin-bottom:6px;letter-spacing:-0.2px}
+.step p{font-size:14px;color:#555;line-height:1.7}
+.step p strong{color:#888;font-weight:400}
+.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:48px}
+.plan{background:#111;border:1px solid #1e1e1e;border-radius:16px;padding:24px;position:relative}
+.plan.featured{border-color:#3a5a10;background:#0d1500}
+.plan.decoy{border-color:#2a2010;background:#0d0a00}
+.popular-tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-family:'DM Mono',monospace;font-size:10px;background:#c8f55a;color:#0a0a0a;padding:3px 12px;border-radius:20px;font-weight:500;white-space:nowrap}
+.plan-label{font-family:'DM Mono',monospace;font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px}
+.plan.featured .plan-label{color:#5a8a20}
+.plan.decoy .plan-label{color:#7a6020}
+.plan-price .amount{font-family:'DM Serif Display',serif;font-size:38px;letter-spacing:-2px;color:#f0ede8}
+.plan-price .period{font-size:12px;color:#444;margin-left:3px}
+.plan-desc{font-size:12px;color:#444;margin-bottom:20px;line-height:1.6;margin-top:6px}
+.plan.featured .plan-desc{color:#5a7a30}
+.plan.decoy .plan-desc{color:#7a6030}
+.plan-features{list-style:none;margin-bottom:24px}
+.plan-features li{font-size:12px;color:#555;padding:6px 0;border-bottom:1px solid #111;display:flex;align-items:center;gap:8px}
+.plan-features li:last-child{border-bottom:none}
+.feat-dot{width:4px;height:4px;border-radius:50%;background:#222;flex-shrink:0}
+.plan.featured .feat-dot{background:#5a8a20}
+.plan.featured .plan-features li{color:#5a7a40}
+.plan.decoy .feat-dot{background:#5a4a10}
+.plan.decoy .plan-features li{color:#7a6030}
+.btn-plan{width:100%;padding:11px;border:1px solid #222;border-radius:8px;background:transparent;color:#444;font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s}
+.btn-plan:hover{border-color:#444;color:#f0ede8}
+.btn-plan-primary{width:100%;padding:11px;border:none;border-radius:8px;background:#c8f55a;color:#0a0a0a;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.btn-plan-primary:hover{background:#d4f870}
+.btn-plan-gold{width:100%;padding:11px;border:1px solid #5a4010;border-radius:8px;background:transparent;color:#8a6020;font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s}
+.btn-plan-gold:hover{background:#1a1000;color:#c8a040}
+.cancel-note{text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:#2a2a2a;margin-top:14px;letter-spacing:0.05em}
+.fomo-box{background:#0a0f00;border:1px solid #1e2e08;border-radius:12px;padding:20px 24px;margin-top:20px;display:flex;align-items:center;gap:16px}
+.fomo-icon{width:36px;height:36px;border-radius:50%;background:#1a2a00;border:1px solid #2a4010;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.fomo-text{font-size:13px;color:#5a7a30;line-height:1.6}
+.fomo-text strong{color:#8ab840}
+.support-box{background:#111;border:1px solid #1e1e1e;border-radius:16px;overflow:hidden;margin-top:48px}
+.support-header{padding:20px 24px;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;gap:12px}
+.support-dot{width:8px;height:8px;border-radius:50%;background:#c8f55a}
+.support-title{font-family:'DM Mono',monospace;font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.1em}
+.support-status{font-family:'DM Mono',monospace;font-size:10px;color:#3a5a10;margin-left:auto}
+.chat-area{padding:20px 24px;min-height:160px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:82%;font-size:14px;line-height:1.6;padding:12px 16px;border-radius:12px}
+.msg.ai{background:#0f0f0f;border:1px solid #1e1e1e;color:#888;align-self:flex-start;border-radius:0 12px 12px 12px}
+.msg.ai strong{color:#c8f55a;font-weight:400}
+.msg.user{background:#0d1500;border:1px solid #2a3a10;color:#8ab840;align-self:flex-end;border-radius:12px 0 12px 12px}
+.typing{display:none;align-items:center;gap:6px;padding:0 24px 16px}
+.typing.visible{display:flex}
+.typing span{font-size:12px;color:#333;font-family:'DM Mono',monospace}
+.dot-anim{display:flex;gap:4px}
+.dot-anim div{width:4px;height:4px;border-radius:50%;background:#333;animation:bounce 1.2s infinite}
+.dot-anim div:nth-child(2){animation-delay:0.2s}
+.dot-anim div:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.support-input-wrap{border-top:1px solid #1a1a1a;padding:16px 24px;display:flex;gap:12px;align-items:flex-end}
+.support-input{flex:1;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:8px;color:#f0ede8;font-family:'Outfit',sans-serif;font-size:14px;padding:10px 14px;outline:none;resize:none;min-height:40px;max-height:120px;transition:border-color 0.2s;line-height:1.5}
+.support-input:focus{border-color:#2a3a10}
+.support-input::placeholder{color:#2a2a2a}
+.btn-send{padding:10px 18px;background:#c8f55a;color:#0a0a0a;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;height:40px}
+.btn-send:hover{background:#d4f870}
+.btn-send:disabled{background:#1a1a1a;color:#333;cursor:not-allowed}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 24px 16px}
+.chip{font-size:12px;color:#444;border:1px solid #1e1e1e;border-radius:20px;padding:5px 12px;cursor:pointer;transition:all 0.2s;font-family:'DM Mono',monospace}
+.chip:hover{color:#c8f55a;border-color:#2a3a10}
+.cta-section{padding:100px 0;text-align:center}
+.cta-section h2{font-family:'DM Serif Display',serif;font-size:clamp(32px,5vw,52px);letter-spacing:-1.5px;margin-bottom:20px;line-height:1.1}
+.cta-section h2 em{font-style:italic;color:#c8f55a}
+.cta-section p{font-size:16px;color:#555;margin-bottom:40px;font-weight:300}
+footer{border-top:1px solid #111;padding:28px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-logo{font-family:'DM Serif Display',serif;font-size:20px}
+.footer-logo span{color:#c8f55a}
+.footer-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.footer-copy{font-family:'DM Mono',monospace;font-size:11px;color:#2a2a2a;letter-spacing:0.05em}
+.footer-disclaimer{font-family:'DM Mono',monospace;font-size:10px;color:#1e1e1e;max-width:360px;text-align:right;line-height:1.5}
+@media(max-width:600px){.modules{grid-template-columns:1fr}.pricing{grid-template-columns:1fr}.stats-bar{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="wrap">
+  <nav>
+    <div class="logo">Calibra<span>.</span></div>
+    <div class="nav-right">
+      <span class="lang-auto-badge" id="auto-badge">auto</span>
+      <select class="lang-select" id="lang-select" onchange="setLang(this.value,true)">
+        <option value="pt">🇧🇷 PT</option>
+        <option value="en">🇺🇸 EN</option>
+        <option value="es">🇪🇸 ES</option>
+        <option value="fr">🇫🇷 FR</option>
+        <option value="de">🇩🇪 DE</option>
+        <option value="it">🇮🇹 IT</option>
+      </select>
+      <button class="btn-nav" data-i18n="nav_cta"></button>
+    </div>
+  </nav>
+  <div class="hero">
+    <div class="hero-tag" data-i18n="hero_tag"></div>
+    <h1 data-i18n="hero_h1"></h1>
+    <p class="hero-sub" data-i18n="hero_sub"></p>
+    <div class="hero-ctas">
+      <button class="btn-primary" data-i18n="hero_cta1"></button>
+      <button class="btn-ghost" data-i18n="hero_cta2"></button>
+    </div>
+    <div class="hero-note" data-i18n="hero_note"></div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-val">94%</div><div class="stat-label" data-i18n="stat1"></div></div>
+    <div class="stat"><div class="stat-val">2s</div><div class="stat-label" data-i18n="stat2"></div></div>
+    <div class="stat"><div class="stat-val">+EV</div><div class="stat-label" data-i18n="stat3"></div></div>
+  </div>
+  <div class="section">
+    <div class="section-tag" data-i18n="s_product_tag"></div>
+    <h2 data-i18n="s_product_h2"></h2>
+    <p class="section-sub" data-i18n="s_product_sub"></p>
+    <div class="modules">
+      <div class="module">
+        <div class="module-tag" data-i18n="mod1_tag"></div>
+        <div class="module-icon">◎</div>
+        <h3 data-i18n="mod1_title"></h3>
+        <p data-i18n="mod1_desc"></p>
+        <div class="module-note"><strong data-i18n="multiples_label"></strong> <span data-i18n="mod1_note"></span></div>
+      </div>
+      <div class="module premium">
+        <div class="module-tag" data-i18n="mod2_tag"></div>
+        <div class="module-badge" data-i18n="premium_label"></div>
+        <div class="module-icon">⬡</div>
+        <h3 data-i18n="mod2_title"></h3>
+        <p data-i18n="mod2_desc"></p>
+        <div class="module-note" style="color:#2a4a10"><strong style="color:#3a6010" data-i18n="multiples_label"></strong> <span data-i18n="mod2_note"></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-tag" data-i18n="s_how_tag"></div>
+    <h2 data-i18n="s_how_h2"></h2>
+    <p class="section-sub" data-i18n="s_how_sub"></p>
+    <div class="how">
+      <div class="step"><div class="step-num">01</div><div><h4 data-i18n="step1_h"></h4><p data-i18n="step1_p"></p></div></div>
+      <div class="step"><div class="step-num">02</div><div><h4 data-i18n="step2_h"></h4><p data-i18n="step2_p"></p></div></div>
+      <div class="step"><div class="step-num">03</div><div><h4 data-i18n="step3_h"></h4><p data-i18n="step3_p"></p></div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-tag" data-i18n="s_plans_tag"></div>
+    <h2 data-i18n="s_plans_h2"></h2>
+    <p class="section-sub" data-i18n="s_plans_sub"></p>
+    <div class="pricing">
+      <div class="plan">
+        <div class="plan-label">Free</div>
+        <div class="plan-price"><span class="amount" id="price-free"></span><span class="period" data-i18n="period_forever"></span></div>
+        <p class="plan-desc" data-i18n="plan_free_desc"></p>
+        <ul class="plan-features">
+          <li><span class="feat-dot"></span><span data-i18n="f_free1"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_free2"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_free3"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_free4"></span></li>
+        </ul>
+        <button class="btn-plan" data-i18n="btn_free"></button>
+      </div>
+      <div class="plan featured">
+        <div class="popular-tag" data-i18n="popular_tag"></div>
+        <div class="plan-label">Pro</div>
+        <div class="plan-price"><span class="amount" id="price-pro"></span><span class="period" data-i18n="period_month"></span></div>
+        <p class="plan-desc" data-i18n="plan_pro_desc"></p>
+        <ul class="plan-features">
+          <li><span class="feat-dot"></span><span data-i18n="f_pro1"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_pro2"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_pro3"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_pro4"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_pro5"></span></li>
+        </ul>
+        <button class="btn-plan-primary" data-i18n="btn_pro"></button>
+      </div>
+      <div class="plan decoy">
+        <div class="plan-label">Elite</div>
+        <div class="plan-price"><span class="amount" id="price-elite"></span><span class="period" data-i18n="period_month"></span></div>
+        <p class="plan-desc" data-i18n="plan_elite_desc"></p>
+        <ul class="plan-features">
+          <li><span class="feat-dot"></span><span data-i18n="f_elite1"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_elite2"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_elite3"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_elite4"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_elite5"></span></li>
+        </ul>
+        <button class="btn-plan-gold" data-i18n="btn_elite"></button>
+      </div>
+    </div>
+    <div class="cancel-note" data-i18n="cancel_note"></div>
+    <div class="fomo-box">
+      <div class="fomo-icon">◎</div>
+      <div class="fomo-text" data-i18n="fomo_text"></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-tag" data-i18n="s_support_tag"></div>
+    <h2 data-i18n="s_support_h2"></h2>
+    <p class="section-sub" data-i18n="s_support_sub"></p>
+    <div class="support-box">
+      <div class="support-header">
+        <div class="support-dot"></div>
+        <div class="support-title">Calibra Support</div>
+        <div class="support-status" data-i18n="support_status"></div>
+      </div>
+      <div class="chat-area" id="chat-area">
+        <div class="msg ai" id="initial-msg"></div>
+      </div>
+      <div class="typing" id="typing"><div class="dot-anim"><div></div><div></div><div></div></div><span data-i18n="typing_text"></span></div>
+      <div class="chips" id="chips">
+        <div class="chip" id="chip1" onclick="sendChipKey('chip1_q')"></div>
+        <div class="chip" id="chip2" onclick="sendChipKey('chip2_q')"></div>
+        <div class="chip" id="chip3" onclick="sendChipKey('chip3_q')"></div>
+        <div class="chip" id="chip4" onclick="sendChipKey('chip4_q')"></div>
+      </div>
+      <div class="support-input-wrap">
+        <textarea class="support-input" id="support-input" rows="1" onkeydown="handleKey(event)"></textarea>
+        <button class="btn-send" id="btn-send" onclick="sendMessage()" data-i18n="btn_send"></button>
+      </div>
+    </div>
+  </div>
+  <div class="cta-section">
+    <h2 data-i18n="cta_h2"></h2>
+    <p data-i18n="cta_sub"></p>
+    <button class="btn-primary" data-i18n="cta_btn"></button>
+  </div>
+  <footer>
+    <div class="footer-logo">Calibra<span>.</span></div>
+    <div class="footer-right">
+      <div class="footer-copy" data-i18n="footer_copy"></div>
+      <div class="footer-disclaimer" data-i18n="footer_disclaimer"></div>
+    </div>
+  </footer>
+</div>
+<script>
+const i18n={pt:{nav_cta:"Começar grátis",hero_tag:"Análise quantitativa de apostas · Beta 2026",hero_h1:`Para de apostar<br>no <em>feeling.</em><br><span class="muted">Aposta no edge.</span>`,hero_sub:"Calibra analisa qualquer aposta esportiva e diz se existe EV positivo — antes de tu colocares o dinheiro.",hero_cta1:"Analisar aposta grátis →",hero_cta2:"Ver como funciona",hero_note:"3 análises gratuitas por mês · sem cartão",stat1:"de apostas têm EV negativo",stat2:"para gerar análise completa",stat3:"é a única aposta que importa",s_product_tag:"O produto",s_product_h2:`Dois módulos.<br><em>Um objetivo.</em>`,s_product_sub:"Identificar onde o mercado erra — e aproveitar antes dos outros.",mod1_tag:"Módulo 01 · Disponível no free",mod1_title:"Analisar aposta",mod1_desc:"Cola o evento, mercado e odd. A IA estima a probabilidade real, calcula o EV e diz quanto alocar.",multiples_label:"Múltiplas:",mod1_note:"cada perna é analisada individualmente — uma com EV negativo contamina toda a múltipla. Cada análise consome 1 crédito.",mod2_tag:"Módulo 02 · Pro e Elite",premium_label:"Premium",mod2_title:"Scanner de EV",mod2_desc:"Escreves o que estás buscando em linguagem livre. A IA varre os mercados e retorna oportunidades com edge positivo.",mod2_note:"o scanner identifica pernas compatíveis com EV positivo — tu montas, nós validamos cada uma.",s_how_tag:"Como funciona",s_how_h2:`Simples como<br><em>deve ser.</em>`,s_how_sub:"Sem fórmulas, sem planilhas. Só escreves e recebes a análise.",step1_h:"Descreves a aposta ou o que buscas",step1_p:'Nome do evento, mercado e odd — ou dizes <strong>"quero edges em futebol europeu hoje"</strong> para o scanner.',step2_h:"A IA calibra a probabilidade real",step2_p:"Comparamos a odd do mercado com a estimativa da IA, levando em conta contexto, histórico e fatores do evento.",step3_h:"Recebes o veredicto e o sizing recomendado",step3_p:"EV positivo ou negativo, análise em texto e quanto alocar da tua banca — via <strong>Half-Kelly Criterion.</strong>",s_plans_tag:"Planos",s_plans_h2:`Começa grátis.<br><em>Escala quando quiseres.</em>`,s_plans_sub:"Cada análise vale mais do que custa. O limite do free existe para sentires a diferença.",period_forever:"/ sempre",period_month:"/ mês",plan_free_desc:"Para conhecer o produto.",f_free1:"3 análises por mês",f_free2:"Módulo 1 completo",f_free3:"EV + sizing incluídos",f_free4:"Scanner não incluso",btn_free:"Começar grátis",popular_tag:"mais popular",plan_pro_desc:"Para quem aposta com frequência.",f_pro1:"Análises ilimitadas",f_pro2:"Scanner de EV — 10 scans/mês",f_pro3:"Múltiplas — análise por perna",f_pro4:"Sizing via Half-Kelly",f_pro5:"Todos os esportes",btn_pro:"Assinar Pro →",plan_elite_desc:"Para bancas maiores e operação séria.",f_elite1:"Tudo do Pro",f_elite2:"Scanner ilimitado",f_elite3:"Acesso a novos mercados",f_elite4:"Resposta prioritária",f_elite5:"Resumo semanal das melhores oportunidades identificadas pelo scanner",btn_elite:"Assinar Elite",cancel_note:"Cancela quando quiseres · sem fidelidade · sem taxa",fomo_text:"Utilizadores Free esgotam o limite médio em <strong>5 dias.</strong> Quem aposta mais de uma vez por semana sente a diferença rápido.",s_support_tag:"Suporte",s_support_h2:`Dúvidas?<br><em>Pergunta agora.</em>`,s_support_sub:"Suporte inteligente disponível 24h — produto, EV, sizing, planos.",support_status:"online agora",typing_text:"a responder...",btn_send:"Enviar",support_init:"Olá. Sou o suporte do <strong>Calibra</strong>. Pergunta o que quiseres sobre o produto, EV, múltiplas, planos ou qualquer outra dúvida.",support_placeholder:"Escreve a tua dúvida...",chip1:"O que é EV?",chip2:"Múltiplas",chip3:"Qual plano?",chip4:"Garante lucro?",chip1_q:"O que é EV e por que importa?",chip2_q:"Como funcionam as múltiplas no Calibra?",chip3_q:"Qual plano devo escolher?",chip4_q:"O Calibra garante lucro?",cta_h2:`Para de deixar<br><em>dinheiro na mesa.</em>`,cta_sub:"Começa com 3 análises gratuitas. Sem cartão.",cta_btn:"Analisar minha primeira aposta →",footer_copy:"© 2026 · análise quantitativa de apostas esportivas",footer_disclaimer:"O Calibra é uma ferramenta de análise estatística. Não garantimos lucros nem nos responsabilizamos por perdas. Aposte com responsabilidade.",prices:{free:"R$0",pro:"R$29",elite:"R$79"}},en:{nav_cta:"Start free",hero_tag:"Quantitative sports betting analysis · Beta 2026",hero_h1:`Stop betting on<br><em>gut feeling.</em><br><span class="muted">Bet on edge.</span>`,hero_sub:"Calibra analyses any sports bet and tells you if there's positive EV — before you put your money in.",hero_cta1:"Analyse a bet for free →",hero_cta2:"See how it works",hero_note:"3 free analyses per month · no card",stat1:"of bets have negative EV",stat2:"to generate full analysis",stat3:"is the only bet that matters",s_product_tag:"The product",s_product_h2:`Two modules.<br><em>One goal.</em>`,s_product_sub:"Find where the market is wrong — and act before anyone else.",mod1_tag:"Module 01 · Available on free",mod1_title:"Analyse a bet",mod1_desc:"Enter event, market and odds. AI estimates real probability, calculates EV and recommends stake size.",multiples_label:"Accumulators:",mod1_note:"each leg is analysed individually — one negative EV leg contaminates the whole bet. Each analysis uses 1 credit.",mod2_tag:"Module 02 · Pro & Elite",premium_label:"Premium",mod2_title:"EV Scanner",mod2_desc:"Write what you're looking for in plain language. AI scans the markets and returns opportunities with positive edge.",mod2_note:"the scanner finds legs with positive EV — you build the acca, we validate each leg.",s_how_tag:"How it works",s_how_h2:`Simple as it<br><em>should be.</em>`,s_how_sub:"No formulas, no spreadsheets. Just write and get your analysis.",step1_h:"Describe the bet or what you're looking for",step1_p:'Event, market and odds — or type <strong>"find edges in European football today"</strong> for the scanner.',step2_h:"AI calibrates the real probability",step2_p:"We compare market odds against AI estimate, accounting for context, history and event-specific factors.",step3_h:"Get the verdict and recommended stake",step3_p:"Positive or negative EV, written analysis and stake size — via <strong>Half-Kelly Criterion.</strong>",s_plans_tag:"Plans",s_plans_h2:`Start free.<br><em>Scale when ready.</em>`,s_plans_sub:"Each analysis is worth more than it costs. The free limit exists so you feel the difference.",period_forever:"/ forever",period_month:"/ month",plan_free_desc:"To discover the product.",f_free1:"3 analyses per month",f_free2:"Full Module 1",f_free3:"EV + sizing included",f_free4:"Scanner not included",btn_free:"Start free",popular_tag:"most popular",plan_pro_desc:"For frequent bettors.",f_pro1:"Unlimited analyses",f_pro2:"EV Scanner — 10 scans/month",f_pro3:"Accumulators — per-leg analysis",f_pro4:"Half-Kelly sizing",f_pro5:"All sports",btn_pro:"Subscribe Pro →",plan_elite_desc:"For serious bettors with larger banks.",f_elite1:"Everything in Pro",f_elite2:"Unlimited scanner",f_elite3:"Early access to new markets",f_elite4:"Priority support",f_elite5:"Weekly summary of best scanner opportunities",btn_elite:"Subscribe Elite",cancel_note:"Cancel anytime · no commitment · no fees",fomo_text:"Free users hit their limit in an average of <strong>5 days.</strong> Anyone betting more than once a week feels the difference fast.",s_support_tag:"Support",s_support_h2:`Questions?<br><em>Ask now.</em>`,s_support_sub:"AI support available 24h — product, EV, sizing, plans.",support_status:"online now",typing_text:"replying...",btn_send:"Send",support_init:"Hi. I'm Calibra's support. Ask me anything about the product, EV, accumulators, plans or anything else.",support_placeholder:"Type your question...",chip1:"What is EV?",chip2:"Accumulators",chip3:"Which plan?",chip4:"Guaranteed profit?",chip1_q:"What is EV and why does it matter?",chip2_q:"How do accumulators work in Calibra?",chip3_q:"Which plan should I choose?",chip4_q:"Does Calibra guarantee profit?",cta_h2:`Stop leaving<br><em>money on the table.</em>`,cta_sub:"Start with 3 free analyses. No card needed.",cta_btn:"Analyse my first bet →",footer_copy:"© 2026 · quantitative sports betting analysis",footer_disclaimer:"Calibra is a statistical analysis tool. We do not guarantee profits or accept liability for betting losses. Gamble responsibly.",prices:{free:"$0",pro:"$7",elite:"$19"}},es:{nav_cta:"Empezar gratis",hero_tag:"Análisis cuantitativo de apuestas · Beta 2026",hero_h1:`Deja de apostar<br>por <em>intuición.</em><br><span class="muted">Apuesta al edge.</span>`,hero_sub:"Calibra analiza cualquier apuesta deportiva y te dice si hay EV positivo — antes de poner tu dinero.",hero_cta1:"Analizar apuesta gratis →",hero_cta2:"Ver cómo funciona",hero_note:"3 análisis gratuitos al mes · sin tarjeta",stat1:"de apuestas tienen EV negativo",stat2:"para análisis completo",stat3:"es la única apuesta que importa",s_product_tag:"El producto",s_product_h2:`Dos módulos.<br><em>Un objetivo.</em>`,s_product_sub:"Identificar dónde falla el mercado — y aprovecharlo antes.",mod1_tag:"Módulo 01 · Disponible en free",mod1_title:"Analizar apuesta",mod1_desc:"Pega evento, mercado y cuota. La IA estima probabilidad real, calcula EV y recomienda stake.",multiples_label:"Combinadas:",mod1_note:"cada selección se analiza individualmente — una con EV negativo contamina toda la combinada. Cada análisis usa 1 crédito.",mod2_tag:"Módulo 02 · Pro y Elite",premium_label:"Premium",mod2_title:"Scanner de EV",mod2_desc:"Escribe lo que buscas en lenguaje libre. La IA escanea mercados y devuelve oportunidades con edge positivo.",mod2_note:"el scanner identifica selecciones con EV positivo — tú construyes la combinada, nosotros validamos cada selección.",s_how_tag:"Cómo funciona",s_how_h2:`Simple como<br><em>debe ser.</em>`,s_how_sub:"Sin fórmulas, sin hojas de cálculo. Solo escribes y recibes el análisis.",step1_h:"Describes la apuesta o lo que buscas",step1_p:'Evento, mercado y cuota — o escribe <strong>"quiero edges en fútbol europeo hoy"</strong> para el scanner.',step2_h:"La IA calibra la probabilidad real",step2_p:"Comparamos cuota del mercado con estimación IA, considerando contexto, historial y factores del evento.",step3_h:"Recibes el veredicto y el sizing recomendado",step3_p:"EV positivo o negativo, análisis en texto y cuánto apostar — vía <strong>Half-Kelly Criterion.</strong>",s_plans_tag:"Planes",s_plans_h2:`Empieza gratis.<br><em>Escala cuando quieras.</em>`,s_plans_sub:"Cada análisis vale más de lo que cuesta. El límite del free existe para que sientas la diferencia.",period_forever:"/ siempre",period_month:"/ mes",plan_free_desc:"Para conocer el producto.",f_free1:"3 análisis al mes",f_free2:"Módulo 1 completo",f_free3:"EV + sizing incluidos",f_free4:"Scanner no incluido",btn_free:"Empezar gratis",popular_tag:"más popular",plan_pro_desc:"Para quien apuesta con frecuencia.",f_pro1:"Análisis ilimitados",f_pro2:"Scanner de EV — 10 scans/mes",f_pro3:"Combinadas — análisis por selección",f_pro4:"Sizing vía Half-Kelly",f_pro5:"Todos los deportes",btn_pro:"Suscribirse Pro →",plan_elite_desc:"Para bancas mayores y operación seria.",f_elite1:"Todo lo de Pro",f_elite2:"Scanner ilimitado",f_elite3:"Acceso a nuevos mercados",f_elite4:"Respuesta prioritaria",f_elite5:"Resumen semanal de las mejores oportunidades del scanner",btn_elite:"Suscribirse Elite",cancel_note:"Cancela cuando quieras · sin compromiso · sin comisiones",fomo_text:"Los usuarios Free agotan el límite en promedio en <strong>5 días.</strong> Quien apuesta más de una vez por semana siente la diferencia.",s_support_tag:"Soporte",s_support_h2:`¿Dudas?<br><em>Pregunta ahora.</em>`,s_support_sub:"Soporte inteligente 24h.",support_status:"en línea ahora",typing_text:"respondiendo...",btn_send:"Enviar",support_init:"Hola. Soy el soporte de <strong>Calibra</strong>. Pregunta lo que quieras sobre el producto, EV, combinadas o planes.",support_placeholder:"Escribe tu pregunta...",chip1:"¿Qué es el EV?",chip2:"Combinadas",chip3:"¿Qué plan?",chip4:"¿Garantiza beneficio?",chip1_q:"¿Qué es el EV y por qué importa?",chip2_q:"¿Cómo funcionan las combinadas en Calibra?",chip3_q:"¿Qué plan debería elegir?",chip4_q:"¿Calibra garantiza beneficios?",cta_h2:`Deja de dejar<br><em>dinero sobre la mesa.</em>`,cta_sub:"Empieza con 3 análisis gratuitos. Sin tarjeta.",cta_btn:"Analizar mi primera apuesta →",footer_copy:"© 2026 · análisis cuantitativo de apuestas deportivas",footer_disclaimer:"Calibra es una herramienta de análisis estadístico. No garantizamos beneficios. Apuesta con responsabilidad.",prices:{free:"€0",pro:"€7",elite:"€19"}},fr:{nav_cta:"Commencer gratuitement",hero_tag:"Analyse quantitative des paris · Beta 2026",hero_h1:`Arrête de parier<br>à <em>l'instinct.</em><br><span class="muted">Parie sur l'edge.</span>`,hero_sub:"Calibra analyse n'importe quel pari sportif et te dit s'il y a un EV positif — avant de miser.",hero_cta1:"Analyser un pari gratuitement →",hero_cta2:"Voir comment ça marche",hero_note:"3 analyses gratuites par mois · sans carte",stat1:"des paris ont un EV négatif",stat2:"pour une analyse complète",stat3:"est le seul pari qui compte",s_product_tag:"Le produit",s_product_h2:`Deux modules.<br><em>Un objectif.</em>`,s_product_sub:"Identifier où le marché se trompe — et en profiter avant les autres.",mod1_tag:"Module 01 · Disponible en free",mod1_title:"Analyser un pari",mod1_desc:"Colle l'événement, le marché et la cote. L'IA estime la probabilité réelle, calcule l'EV et recommande la mise.",multiples_label:"Combinés:",mod1_note:"chaque sélection est analysée individuellement — une avec EV négatif contamine tout le combiné. Chaque analyse utilise 1 crédit.",mod2_tag:"Module 02 · Pro et Elite",premium_label:"Premium",mod2_title:"Scanner EV",mod2_desc:"Écris ce que tu cherches en langage libre. L'IA scanne les marchés et retourne les opportunités avec edge positif.",mod2_note:"le scanner identifie les sélections à EV positif — tu construis le combiné, nous validons chaque sélection.",s_how_tag:"Comment ça marche",s_how_h2:`Simple comme<br><em>ça devrait l'être.</em>`,s_how_sub:"Pas de formules, pas de tableurs. Tu écris et tu reçois l'analyse.",step1_h:"Tu décris le pari ou ce que tu cherches",step1_p:"Nom de l'événement, marché et cote — ou écris ce que tu veux trouver pour le scanner.",step2_h:"L'IA calibre la probabilité réelle",step2_p:"Nous comparons la cote du marché avec l'estimation IA, en tenant compte du contexte et de l'historique.",step3_h:"Tu reçois le verdict et la mise recommandée",step3_p:"EV positif ou négatif, analyse textuelle et mise — via le <strong>Half-Kelly Criterion.</strong>",s_plans_tag:"Formules",s_plans_h2:`Commence gratuitement.<br><em>Évolue quand tu veux.</em>`,s_plans_sub:"Chaque analyse vaut plus qu'elle ne coûte.",period_forever:"/ toujours",period_month:"/ mois",plan_free_desc:"Pour découvrir le produit.",f_free1:"3 analyses par mois",f_free2:"Module 1 complet",f_free3:"EV + sizing inclus",f_free4:"Scanner non inclus",btn_free:"Commencer gratuitement",popular_tag:"le plus populaire",plan_pro_desc:"Pour qui parie fréquemment.",f_pro1:"Analyses illimitées",f_pro2:"Scanner EV — 10 scans/mois",f_pro3:"Combinés — analyse par sélection",f_pro4:"Sizing via Half-Kelly",f_pro5:"Tous les sports",btn_pro:"S'abonner Pro →",plan_elite_desc:"Pour les grosses bankrolls.",f_elite1:"Tout du Pro",f_elite2:"Scanner illimité",f_elite3:"Accès aux nouveaux marchés",f_elite4:"Réponse prioritaire",f_elite5:"Résumé hebdomadaire des meilleures opportunités du scanner",btn_elite:"S'abonner Elite",cancel_note:"Annule quand tu veux · sans engagement · sans frais",fomo_text:"Les utilisateurs Free atteignent leur limite en moyenne en <strong>5 jours.</strong>",s_support_tag:"Support",s_support_h2:`Des questions?<br><em>Pose-les maintenant.</em>`,s_support_sub:"Support intelligent 24h.",support_status:"en ligne maintenant",typing_text:"en train de répondre...",btn_send:"Envoyer",support_init:"Bonjour. Je suis le support de <strong>Calibra</strong>. Pose toutes tes questions sur le produit, l'EV, les combinés ou les formules.",support_placeholder:"Écris ta question...",chip1:"C'est quoi l'EV?",chip2:"Combinés",chip3:"Quelle formule?",chip4:"Profit garanti?",chip1_q:"C'est quoi l'EV et pourquoi c'est important?",chip2_q:"Comment fonctionnent les combinés dans Calibra?",chip3_q:"Quelle formule choisir?",chip4_q:"Calibra garantit-il des profits?",cta_h2:`Arrête de laisser<br><em>de l'argent sur la table.</em>`,cta_sub:"Commence avec 3 analyses gratuites. Sans carte.",cta_btn:"Analyser mon premier pari →",footer_copy:"© 2026 · analyse quantitative des paris sportifs",footer_disclaimer:"Calibra est un outil d'analyse statistique. Nous ne garantissons pas les profits. Jouez de manière responsable.",prices:{free:"€0",pro:"€7",elite:"€19"}},de:{nav_cta:"Kostenlos starten",hero_tag:"Quantitative Wettanalyse · Beta 2026",hero_h1:`Hör auf,<br>auf <em>Bauchgefühl</em><br><span class="muted">zu setzen.</span>`,hero_sub:"Calibra analysiert jede Sportwette und sagt dir, ob positiver EV besteht — bevor du einsetzt.",hero_cta1:"Wette gratis analysieren →",hero_cta2:"So funktioniert's",hero_note:"3 kostenlose Analysen pro Monat · ohne Karte",stat1:"der Wetten haben negativen EV",stat2:"für vollständige Analyse",stat3:"ist die einzige Wette die zählt",s_product_tag:"Das Produkt",s_product_h2:`Zwei Module.<br><em>Ein Ziel.</em>`,s_product_sub:"Herausfinden, wo der Markt irrt — und es vor anderen nutzen.",mod1_tag:"Modul 01 · Im Free-Plan verfügbar",mod1_title:"Wette analysieren",mod1_desc:"Gib Event, Markt und Quote ein. KI schätzt Wahrscheinlichkeit, berechnet EV und empfiehlt Einsatz.",multiples_label:"Kombiwetten:",mod1_note:"jede Auswahl wird einzeln analysiert — eine mit negativem EV kontaminiert die ganze Kombiwette. Jede Analyse verbraucht 1 Guthaben.",mod2_tag:"Modul 02 · Pro & Elite",premium_label:"Premium",mod2_title:"EV-Scanner",mod2_desc:"Schreib in freier Sprache, was du suchst. KI scannt die Märkte und liefert Chancen mit positivem Edge.",mod2_note:"der Scanner findet Auswahlen mit positivem EV — du baust die Kombiwette, wir validieren jede Auswahl.",s_how_tag:"So funktioniert's",s_how_h2:`So einfach wie<br><em>es sein sollte.</em>`,s_how_sub:"Keine Formeln, keine Tabellen. Einfach schreiben und Analyse erhalten.",step1_h:"Beschreibe die Wette oder was du suchst",step1_p:"Eventname, Markt und Quote — oder schreib was du im Scanner suchen möchtest.",step2_h:"KI kalibriert die echte Wahrscheinlichkeit",step2_p:"Wir vergleichen Marktquote mit KI-Schätzung unter Berücksichtigung von Kontext und Historie.",step3_h:"Erhalte Urteil und empfohlenen Einsatz",step3_p:"Positiver oder negativer EV, Analyse und Einsatz — via <strong>Half-Kelly-Kriterium.</strong>",s_plans_tag:"Tarife",s_plans_h2:`Kostenlos starten.<br><em>Skalieren wann du willst.</em>`,s_plans_sub:"Jede Analyse ist mehr wert als sie kostet.",period_forever:"/ immer",period_month:"/ Monat",plan_free_desc:"Um das Produkt kennenzulernen.",f_free1:"3 Analysen pro Monat",f_free2:"Vollständiges Modul 1",f_free3:"EV + Sizing inklusive",f_free4:"Scanner nicht inklusive",btn_free:"Kostenlos starten",popular_tag:"beliebtester",plan_pro_desc:"Für häufige Wetterunde.",f_pro1:"Unbegrenzte Analysen",f_pro2:"EV-Scanner — 10 Scans/Monat",f_pro3:"Kombiwetten — Analyse pro Auswahl",f_pro4:"Half-Kelly Sizing",f_pro5:"Alle Sportarten",btn_pro:"Pro abonnieren →",plan_elite_desc:"Für größere Bankrolls.",f_elite1:"Alles aus Pro",f_elite2:"Unbegrenzter Scanner",f_elite3:"Frühzugang zu neuen Märkten",f_elite4:"Prioritätssupport",f_elite5:"Wöchentliche Zusammenfassung der besten Scanner-Chancen",btn_elite:"Elite abonnieren",cancel_note:"Jederzeit kündbar · keine Bindung · keine Gebühren",fomo_text:"Free-Nutzer erreichen ihr Limit in <strong>5 Tagen.</strong>",s_support_tag:"Support",s_support_h2:`Fragen?<br><em>Jetzt fragen.</em>`,s_support_sub:"KI-Support rund um die Uhr.",support_status:"jetzt online",typing_text:"antworte...",btn_send:"Senden",support_init:"Hallo. Ich bin der Support von <strong>Calibra</strong>. Frag mich alles über Produkt, EV, Kombiwetten oder Tarife.",support_placeholder:"Deine Frage...",chip1:"Was ist EV?",chip2:"Kombiwetten",chip3:"Welcher Tarif?",chip4:"Gewinn garantiert?",chip1_q:"Was ist EV und warum ist es wichtig?",chip2_q:"Wie funktionieren Kombiwetten in Calibra?",chip3_q:"Welchen Tarif soll ich wählen?",chip4_q:"Garantiert Calibra Gewinne?",cta_h2:`Hör auf,<br><em>Geld liegen zu lassen.</em>`,cta_sub:"Starte mit 3 kostenlosen Analysen. Ohne Karte.",cta_btn:"Meine erste Wette analysieren →",footer_copy:"© 2026 · quantitative Sportwettenanalyse",footer_disclaimer:"Calibra ist ein statistisches Analysetool. Keine Gewinngarantie. Bitte verantwortungsvoll spielen.",prices:{free:"€0",pro:"€7",elite:"€19"}},it:{nav_cta:"Inizia gratis",hero_tag:"Analisi quantitativa delle scommesse · Beta 2026",hero_h1:`Smettila di scommettere<br>di <em>istinto.</em><br><span class="muted">Scommetti sull'edge.</span>`,hero_sub:"Calibra analizza qualsiasi scommessa sportiva e ti dice se c'è EV positivo — prima che tu metta i soldi.",hero_cta1:"Analizza una scommessa gratis →",hero_cta2:"Come funziona",hero_note:"3 analisi gratuite al mese · senza carta",stat1:"delle scommesse hanno EV negativo",stat2:"per un'analisi completa",stat3:"è l'unica scommessa che conta",s_product_tag:"Il prodotto",s_product_h2:`Due moduli.<br><em>Un obiettivo.</em>`,s_product_sub:"Identificare dove il mercato sbaglia — e approfittarne prima degli altri.",mod1_tag:"Modulo 01 · Disponibile nel free",mod1_title:"Analizza scommessa",mod1_desc:"Inserisci evento, mercato e quota. L'IA stima la probabilità reale, calcola l'EV e consiglia la puntata.",multiples_label:"Multiple:",mod1_note:"ogni selezione è analizzata individualmente — una con EV negativo contamina tutta la multipla. Ogni analisi usa 1 credito.",mod2_tag:"Modulo 02 · Pro ed Elite",premium_label:"Premium",mod2_title:"Scanner EV",mod2_desc:"Scrivi cosa stai cercando in linguaggio libero. L'IA scansiona i mercati e restituisce opportunità con edge positivo.",mod2_note:"lo scanner identifica selezioni con EV positivo — tu costruisci la multipla, noi validiamo ogni selezione.",s_how_tag:"Come funziona",s_how_h2:`Semplice come<br><em>dovrebbe essere.</em>`,s_how_sub:"Niente formule, niente fogli di calcolo. Scrivi e ricevi l'analisi.",step1_h:"Descrivi la scommessa o cosa cerchi",step1_p:"Nome evento, mercato e quota — o scrivi cosa vuoi trovare per lo scanner.",step2_h:"L'IA calibra la probabilità reale",step2_p:"Confrontiamo la quota del mercato con la stima dell'IA, considerando contesto e storico.",step3_h:"Ricevi il verdetto e la puntata raccomandata",step3_p:"EV positivo o negativo, analisi testuale e puntata — tramite il <strong>Half-Kelly Criterion.</strong>",s_plans_tag:"Piani",s_plans_h2:`Inizia gratis.<br><em>Scala quando vuoi.</em>`,s_plans_sub:"Ogni analisi vale più di quanto costa.",period_forever:"/ sempre",period_month:"/ mese",plan_free_desc:"Per scoprire il prodotto.",f_free1:"3 analisi al mese",f_free2:"Modulo 1 completo",f_free3:"EV + sizing inclusi",f_free4:"Scanner non incluso",btn_free:"Inizia gratis",popular_tag:"più popolare",plan_pro_desc:"Per chi scommette frequentemente.",f_pro1:"Analisi illimitate",f_pro2:"Scanner EV — 10 scans/mese",f_pro3:"Multiple — analisi per selezione",f_pro4:"Sizing via Half-Kelly",f_pro5:"Tutti gli sport",btn_pro:"Abbonati Pro →",plan_elite_desc:"Per bankroll più grandi.",f_elite1:"Tutto del Pro",f_elite2:"Scanner illimitato",f_elite3:"Accesso ai nuovi mercati",f_elite4:"Risposta prioritaria",f_elite5:"Riepilogo settimanale delle migliori opportunità dello scanner",btn_elite:"Abbonati Elite",cancel_note:"Cancella quando vuoi · senza vincoli · senza commissioni",fomo_text:"Gli utenti Free esauriscono il limite in media in <strong>5 giorni.</strong>",s_support_tag:"Supporto",s_support_h2:`Domande?<br><em>Chiedi adesso.</em>`,s_support_sub:"Supporto intelligente 24h.",support_status:"online ora",typing_text:"sto rispondendo...",btn_send:"Invia",support_init:"Ciao. Sono il supporto di <strong>Calibra</strong>. Chiedi tutto sul prodotto, EV, multiple o piani.",support_placeholder:"Scrivi la tua domanda...",chip1:"Cos'è l'EV?",chip2:"Multiple",chip3:"Quale piano?",chip4:"Profitto garantito?",chip1_q:"Cos'è l'EV e perché è importante?",chip2_q:"Come funzionano le multiple in Calibra?",chip3_q:"Quale piano dovrei scegliere?",chip4_q:"Calibra garantisce profitti?",cta_h2:`Smetti di lasciare<br><em>soldi sul tavolo.</em>`,cta_sub:"Inizia con 3 analisi gratuite. Senza carta.",cta_btn:"Analizza la mia prima scommessa →",footer_copy:"© 2026 · analisi quantitativa delle scommesse sportive",footer_disclaimer:"Calibra è uno strumento di analisi statistica. Non garantiamo profitti. Scommetti responsabilmente.",prices:{free:"€0",pro:"€7",elite:"€19"}}};
+const SYSTEM_PROMPT={pt:"Sei o suporte do Calibra. Direto, honesto. Free: R$0, 3/mês. Pro: R$29/mês, ilimitado, scanner 10/mês. Elite: R$79/mês, scanner ilimitado + resumo semanal. Múltiplas: 1 crédito/perna. Cancela quando quiser. Sem garantia de lucro. Máx 3 frases, sem markdown.",en:"You are Calibra's support. Direct, honest. Free: $0, 3/month. Pro: $7/month, unlimited, scanner 10/month. Elite: $19/month, unlimited scanner + weekly summary. Accumulators: 1 credit/leg. Cancel anytime. No profit guarantee. Max 3 sentences, no markdown.",es:"Eres el soporte de Calibra. Directo, honesto. Free: €0, 3/mes. Pro: €7/mes, ilimitado, scanner 10/mes. Elite: €19/mes, scanner ilimitado + resumen semanal. Combinadas: 1 crédito/selección. Sin garantía. Máx 3 frases.",fr:"Tu es le support de Calibra. Direct, honnête. Free: €0, 3/mois. Pro: €7/mois, scanner 10/mois. Elite: €19/mois, scanner illimité + résumé hebdo. Combinés: 1 crédit/sélection. Pas de garantie. Max 3 phrases.",de:"Du bist der Support von Calibra. Direkt, ehrlich. Free: €0, 3/Monat. Pro: €7/Monat, Scanner 10/Monat. Elite: €19/Monat, unbegrenzter Scanner + wöchentliche Zusammenfassung. Keine Garantie. Max 3 Sätze.",it:"Sei il supporto di Calibra. Diretto, onesto. Free: €0, 3/mese. Pro: €7/mese, scanner 10/mese. Elite: €19/mese, scanner illimitato + riepilogo settimanale. Nessuna garanzia. Max 3 frasi."};
+let currentLang='en';
+function detectLang(){const nav=navigator.language||'en';const code=nav.toLowerCase().split('-')[0];const map={pt:'pt',en:'en',es:'es',fr:'fr',de:'de',it:'it'};return map[code]||'en';}
+function setLang(lang,manual=false){currentLang=lang;if(manual)document.getElementById('auto-badge').style.display='none';const t=i18n[lang];document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.getAttribute('data-i18n');if(t[key]!==undefined)el.innerHTML=t[key];});document.getElementById('price-free').textContent=t.prices.free;document.getElementById('price-pro').textContent=t.prices.pro;document.getElementById('price-elite').textContent=t.prices.elite;document.getElementById('support-input').placeholder=t.support_placeholder;document.getElementById('chat-area').innerHTML=`<div class="msg ai" id="initial-msg">${t.support_init}</div>`;document.getElementById('chip1').textContent=t.chip1;document.getElementById('chip2').textContent=t.chip2;document.getElementById('chip3').textContent=t.chip3;document.getElementById('chip4').textContent=t.chip4;document.getElementById('lang-select').value=lang;document.getElementById('chips').style.display='flex';}
+function sendChipKey(key){document.getElementById('support-input').value=i18n[currentLang][key];sendMessage();}
+async function sendMessage(){const input=document.getElementById('support-input');const text=input.value.trim();if(!text)return;addMessage(text,'user');input.value='';document.getElementById('chips').style.display='none';const btn=document.getElementById('btn-send');btn.disabled=true;document.getElementById('typing').classList.add('visible');scrollChat();try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT[currentLang]||SYSTEM_PROMPT.en,messages:[{role:'user',content:text}]})});const data=await res.json();const reply=data.content.map(i=>i.text||'').join('');document.getElementById('typing').classList.remove('visible');addMessage(reply,'ai');}catch{document.getElementById('typing').classList.remove('visible');addMessage('Error. Please try again.','ai');}finally{btn.disabled=false;scrollChat();}}
+function addMessage(text,type){const area=document.getElementById('chat-area');const div=document.createElement('div');div.className=`msg ${type}`;div.textContent=text;area.appendChild(div);scrollChat();}
+function scrollChat(){document.getElementById('chat-area').scrollTop=9999;}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+setLang(detectLang());
+</script>
+</body>
+</html>
