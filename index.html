@@ -498,7 +498,7 @@ CONTEXT: ${contexto||'None'}
 Respond ONLY in valid JSON, no markdown:
 {"prob_estimada":number,"ev_percentual":number,"veredicto":"POSITIVO"|"NEGATIVO"|"NEUTRO","analise":"3-4 sentences on key probability factors","sizing":"1-2 sentences on Half-Kelly stake recommendation (max 5% for positive EV, 0% for negative)","riscos":"1-2 sentences on main risks"}`;
   try{
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const res=await fetch('https://calibra-api.pedrogirao10.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
     const data=await res.json();
     const text=data.content.map(i=>i.text||'').join('');
     const r=JSON.parse(text.replace(/```json|```/g,'').trim());
@@ -530,7 +530,7 @@ Find 3 realistic positive EV opportunities for May 2026. Order by edge descendin
 Respond ONLY in valid JSON array, no markdown:
 [{"evento":"Team A vs Team B","competicao":"League","mercado":"bet description","odd_mercado":number,"prob_estimada":number,"edge":number,"confianca":"ALTA"|"MEDIA"|"BAIXA","resumo":"2 sentences explaining the edge","top":true/false}]`;
   try{
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:apiPrompt}]})});
+    const res=await fetch('https://calibra-api.pedrogirao10.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:apiPrompt}]})});
     const data=await res.json();
     const text=data.content.map(i=>i.text||'').join('');
     const opps=JSON.parse(text.replace(/```json|```/g,'').trim());
@@ -556,7 +556,7 @@ async function sendMessage(){
   const btn=document.getElementById('btn-send');btn.disabled=true;
   document.getElementById('typing').classList.add('visible');scrollChat();
   try{
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT[currentLang]||SYSTEM_PROMPT.en,messages:[{role:'user',content:text}]})});
+    const res=await fetch('https://calibra-api.pedrogirao10.workers.dev',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT[currentLang]||SYSTEM_PROMPT.en,messages:[{role:'user',content:text}]})});
     const data=await res.json();
     const reply=data.content.map(i=>i.text||'').join('');
     document.getElementById('typing').classList.remove('visible');
