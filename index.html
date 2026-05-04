@@ -1,49 +1,573 @@
-export const config = { runtime: 'edge' };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calibra — Bet on Edge</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:#0a0a0a;color:#f0ede8;overflow-x:hidden}
+.noise{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");opacity:0.5}
+.wrap{max-width:800px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+nav{display:flex;align-items:center;justify-content:space-between;padding:32px 0 0;gap:12px}
+.logo{font-family:'DM Serif Display',serif;font-size:26px;letter-spacing:-0.4px;flex-shrink:0}
 
-export default async function handler(req) {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-    });
-  }
+.nav-right{display:flex;align-items:center;gap:12px}
+.lang-select{background:#111;border:1px solid #1e1e1e;color:#888;font-family:'DM Mono',monospace;font-size:11px;padding:6px 10px;border-radius:8px;cursor:pointer;outline:none;transition:all 0.2s}
+.lang-select:hover{border-color:#333;color:#f0ede8}
+.lang-select option{background:#111}
+.lang-auto-badge{font-family:'DM Mono',monospace;font-size:9px;color:#3a5a10;background:#0d1a00;border:1px solid #2a4010;padding:2px 8px;border-radius:20px;letter-spacing:0.08em;white-space:nowrap}
+.btn-nav{font-size:13px;font-family:'Outfit',sans-serif;background:#c8f55a;color:#0a0a0a;border:none;padding:8px 18px;border-radius:8px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.btn-nav:hover{background:#d4f870}
+.hero{padding:100px 0 80px;text-align:center}
+.hero-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:11px;color:#5a8a20;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:24px;margin-top:8px}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(38px,6vw,68px);line-height:1.05;letter-spacing:-2px;margin-bottom:24px}
+.hero h1 em{font-style:italic;color:#c8f55a}
+.hero h1 .muted{color:#333}
+.hero-sub{font-size:17px;color:#666;font-weight:300;line-height:1.7;max-width:480px;margin:0 auto 48px}
+.hero-ctas{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.btn-primary{padding:14px 32px;background:#c8f55a;color:#0a0a0a;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.btn-primary:hover{background:#d4f870;transform:translateY(-1px)}
+.btn-ghost{padding:14px 32px;background:transparent;color:#555;border:1px solid #222;border-radius:10px;font-family:'Outfit',sans-serif;font-size:15px;cursor:pointer;transition:all 0.2s}
+.btn-ghost:hover{color:#f0ede8;border-color:#444}
+.hero-note{font-family:'DM Mono',monospace;font-size:11px;color:#333;margin-top:20px;letter-spacing:0.05em}
+.section{padding:80px 0}
+.section-tag{font-family:'DM Mono',monospace;font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:16px}
+.section h2{font-family:'DM Serif Display',serif;font-size:clamp(28px,4vw,42px);letter-spacing:-1px;line-height:1.1;margin-bottom:16px}
+.section h2 em{font-style:italic;color:#c8f55a}
+.section-sub{font-size:15px;color:#555;font-weight:300;line-height:1.7;max-width:460px;margin-bottom:48px}
 
-  if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
-  }
+/* MODULES CLICAVEIS */
+.modules{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.module{background:#111;border:1px solid #1e1e1e;border-radius:16px;padding:28px;position:relative;cursor:pointer;transition:all 0.25s}
+.module:hover{border-color:#3a3a3a;transform:translateY(-2px)}
+.module.premium{border-color:#2a3a10;background:#0d1500}
+.module.premium:hover{border-color:#5a8a20;transform:translateY(-2px)}
+.module-tag{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;color:#444}
+.module.premium .module-tag{color:#5a8a20}
+.module-icon{width:40px;height:40px;border-radius:10px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:18px}
+.module.premium .module-icon{background:#1a2a00}
+.module h3{font-size:18px;font-weight:500;margin-bottom:10px;letter-spacing:-0.3px}
+.module p{font-size:13px;color:#555;line-height:1.7}
+.module.premium p{color:#5a7a30}
+.module-badge{position:absolute;top:20px;right:20px;font-family:'DM Mono',monospace;font-size:10px;background:#c8f55a;color:#0a0a0a;padding:3px 10px;border-radius:20px;font-weight:500}
+.module-note{margin-top:16px;padding-top:14px;border-top:1px solid #1a1a1a;font-family:'DM Mono',monospace;font-size:11px;color:#333;line-height:1.6}
+.module-note strong{color:#444}
+.module-cta{margin-top:20px;padding-top:16px;border-top:1px solid #1a1a1a;font-family:'DM Mono',monospace;font-size:11px;color:#3a3a3a;display:flex;align-items:center;gap:6px;transition:color 0.2s}
+.module:hover .module-cta{color:#888}
+.module.premium .module-cta{color:#2a4a10}
+.module.premium:hover .module-cta{color:#5a8a20}
 
-  try {
-    const body = await req.json();
-    
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify(body),
-    });
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.visible{display:flex}
+.modal{background:#111;border:1px solid #1e1e1e;border-radius:20px;padding:36px;max-width:600px;width:100%;position:relative;max-height:90vh;overflow-y:auto}
+.modal.premium{border-color:#2a3a10;background:#0d1500}
+.modal-close{position:absolute;top:16px;right:16px;background:transparent;border:none;color:#444;font-size:20px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all 0.2s}
+.modal-close:hover{color:#f0ede8;background:#1a1a1a}
+.modal-tag{font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:#444;margin-bottom:20px}
+.modal.premium .modal-tag{color:#5a8a20}
+.modal h3{font-family:'DM Serif Display',serif;font-size:28px;letter-spacing:-0.5px;margin-bottom:16px}
+.modal-desc{font-size:15px;color:#666;line-height:1.7;margin-bottom:28px}
+.modal-fields{display:flex;flex-direction:column;gap:14px;margin-bottom:28px}
+.modal-field label{display:block;font-family:'DM Mono',monospace;font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px}
+.modal-field input,.modal-field textarea,.modal-field select{width:100%;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:8px;color:#f0ede8;font-family:'Outfit',sans-serif;font-size:14px;padding:11px 14px;outline:none;transition:border-color 0.2s;resize:none}
+.modal-field input:focus,.modal-field textarea:focus,.modal-field select:focus{border-color:#333}
+.modal-field input::placeholder,.modal-field textarea::placeholder{color:#2a2a2a}
+.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-btn{width:100%;padding:14px;background:#c8f55a;color:#0a0a0a;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.modal-btn:hover{background:#d4f870}
+.modal-btn:disabled{background:#1a1a1a;color:#333;cursor:not-allowed}
+.modal-result{background:#0a0a0a;border:1px solid #1e1e1e;border-radius:12px;padding:20px;margin-top:20px;display:none}
+.modal-result.visible{display:block}
+.modal-result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #1a1a1a}
+.modal-result-title{font-family:'DM Mono',monospace;font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.1em}
+.ev-badge{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;border:1px solid}
+.ev-pos{background:#0f2a00;color:#c8f55a;border-color:#3a5a10}
+.ev-neg{background:#2a0000;color:#f55a5a;border-color:#5a1010}
+.ev-neu{background:#1a1a00;color:#f5d05a;border-color:#4a3a10}
+.modal-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.modal-metric{background:#111;border:1px solid #1e1e1e;border-radius:8px;padding:12px;text-align:center}
+.modal-metric-label{font-family:'DM Mono',monospace;font-size:9px;color:#333;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px}
+.modal-metric-value{font-size:18px;font-weight:500;color:#f0ede8}
+.modal-metric-value.green{color:#c8f55a}
+.modal-metric-value.red{color:#f55a5a}
+.modal-text{font-size:13px;color:#666;line-height:1.7}
+.modal-text strong{color:#aaa;font-weight:400}
+.modal-divider{height:1px;background:#1a1a1a;margin:14px 0}
+.modal-loading{display:none;text-align:center;padding:24px;color:#333;font-family:'DM Mono',monospace;font-size:11px}
+.modal-loading.visible{display:block}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #1e1e1e;border-top-color:#c8f55a;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-    const data = await response.json();
+/* SCANNER MODAL */
+.scanner-prompt-wrap{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:12px;padding:18px;margin-bottom:16px;transition:border-color 0.2s}
+.scanner-prompt-wrap:focus-within{border-color:#2a3a10}
+.scanner-prompt-label{font-family:'DM Mono',monospace;font-size:10px;color:#333;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px}
+.scanner-prompt-wrap textarea{width:100%;background:transparent;border:none;outline:none;color:#f0ede8;font-family:'Outfit',sans-serif;font-size:15px;line-height:1.7;resize:none;min-height:64px}
+.scanner-prompt-wrap textarea::placeholder{color:#222;font-style:italic}
+.scanner-suggestions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.scanner-sug{font-size:11px;color:#444;border:1px solid #1e1e1e;border-radius:20px;padding:4px 12px;cursor:pointer;transition:all 0.2s;font-family:'DM Mono',monospace}
+.scanner-sug:hover{color:#c8f55a;border-color:#2a3a10}
+.opp-list{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.opp-card{background:#0f0f0f;border:1px solid #1e1e1e;border-radius:10px;padding:16px;transition:border-color 0.2s}
+.opp-card.top{border-color:#2a3a10;background:#0a1000}
+.opp-top-label{font-family:'DM Mono',monospace;font-size:9px;color:#5a8a20;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
+.opp-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px}
+.opp-event{font-size:14px;font-weight:500;color:#f0ede8}
+.opp-sub{font-size:11px;color:#444;margin-top:2px}
+.opp-edge{font-family:'DM Mono',monospace;font-size:13px;color:#c8f55a;font-weight:500;white-space:nowrap}
+.opp-resumo{font-size:12px;color:#666;line-height:1.6;margin-bottom:10px}
+.opp-details{display:flex;gap:16px;padding-top:10px;border-top:1px solid #1a1a1a;font-family:'DM Mono',monospace;font-size:10px;color:#333}
+.opp-details strong{color:#555}
+.conf-alta{color:#c8f55a}
+.conf-media{color:#f5d05a}
+.conf-baixa{color:#555}
 
-    return new Response(JSON.stringify(data), {
-      status: response.status,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
-  }
+/* PRICING */
+.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:48px}
+.plan{background:#111;border:1px solid #1e1e1e;border-radius:16px;padding:24px;position:relative}
+.plan.featured{border-color:#3a5a10;background:#0d1500}
+.plan.decoy{border-color:#2a2010;background:#0d0a00}
+.popular-tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-family:'DM Mono',monospace;font-size:10px;background:#c8f55a;color:#0a0a0a;padding:3px 12px;border-radius:20px;font-weight:500;white-space:nowrap}
+.plan-label{font-family:'DM Mono',monospace;font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px}
+.plan.featured .plan-label{color:#5a8a20}
+.plan.decoy .plan-label{color:#7a6020}
+.plan-price .amount{font-family:'DM Serif Display',serif;font-size:38px;letter-spacing:-2px;color:#f0ede8}
+.plan-price .period{font-size:12px;color:#444;margin-left:3px}
+.plan-desc{font-size:12px;color:#444;margin-bottom:20px;line-height:1.6;margin-top:6px}
+.plan.featured .plan-desc{color:#5a7a30}
+.plan.decoy .plan-desc{color:#7a6030}
+.plan-features{list-style:none;margin-bottom:24px}
+.plan-features li{font-size:12px;color:#555;padding:6px 0;border-bottom:1px solid #111;display:flex;align-items:center;gap:8px}
+.plan-features li:last-child{border-bottom:none}
+.feat-dot{width:4px;height:4px;border-radius:50%;background:#222;flex-shrink:0}
+.plan.featured .feat-dot{background:#5a8a20}
+.plan.featured .plan-features li{color:#5a7a40}
+.plan.decoy .feat-dot{background:#5a4a10}
+.plan.decoy .plan-features li{color:#7a6030}
+.btn-plan{width:100%;padding:11px;border:1px solid #222;border-radius:8px;background:transparent;color:#444;font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s}
+.btn-plan:hover{border-color:#444;color:#f0ede8}
+.btn-plan-primary{width:100%;padding:11px;border:none;border-radius:8px;background:#c8f55a;color:#0a0a0a;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.btn-plan-primary:hover{background:#d4f870}
+.btn-plan-gold{width:100%;padding:11px;border:1px solid #5a4010;border-radius:8px;background:transparent;color:#8a6020;font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s}
+.btn-plan-gold:hover{background:#1a1000;color:#c8a040}
+.cancel-note{text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:#2a2a2a;margin-top:14px;letter-spacing:0.05em}
+.fomo-box{background:#0a0f00;border:1px solid #1e2e08;border-radius:12px;padding:20px 24px;margin-top:20px;display:flex;align-items:center;gap:16px}
+.fomo-icon{width:36px;height:36px;border-radius:50%;background:#1a2a00;border:1px solid #2a4010;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.fomo-text{font-size:13px;color:#5a7a30;line-height:1.6}
+.fomo-text strong{color:#8ab840}
+
+/* SUPPORT */
+.support-box{background:#111;border:1px solid #1e1e1e;border-radius:16px;overflow:hidden;margin-top:48px}
+.support-header{padding:20px 24px;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;gap:12px}
+.support-dot{width:8px;height:8px;border-radius:50%;background:#c8f55a}
+.support-title{font-family:'DM Mono',monospace;font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.1em}
+.support-status{font-family:'DM Mono',monospace;font-size:10px;color:#3a5a10;margin-left:auto}
+.chat-area{padding:20px 24px;min-height:160px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:82%;font-size:14px;line-height:1.6;padding:12px 16px;border-radius:12px}
+.msg.ai{background:#0f0f0f;border:1px solid #1e1e1e;color:#888;align-self:flex-start;border-radius:0 12px 12px 12px}
+.msg.ai strong{color:#c8f55a;font-weight:400}
+.msg.user{background:#0d1500;border:1px solid #2a3a10;color:#8ab840;align-self:flex-end;border-radius:12px 0 12px 12px}
+.typing{display:none;align-items:center;gap:6px;padding:0 24px 16px}
+.typing.visible{display:flex}
+.typing span{font-size:12px;color:#333;font-family:'DM Mono',monospace}
+.dot-anim{display:flex;gap:4px}
+.dot-anim div{width:4px;height:4px;border-radius:50%;background:#333;animation:bounce 1.2s infinite}
+.dot-anim div:nth-child(2){animation-delay:0.2s}
+.dot-anim div:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.support-input-wrap{border-top:1px solid #1a1a1a;padding:16px 24px;display:flex;gap:12px;align-items:flex-end}
+.support-input{flex:1;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:8px;color:#f0ede8;font-family:'Outfit',sans-serif;font-size:14px;padding:10px 14px;outline:none;resize:none;min-height:40px;max-height:120px;transition:border-color 0.2s;line-height:1.5}
+.support-input:focus{border-color:#2a3a10}
+.support-input::placeholder{color:#2a2a2a}
+.btn-send{padding:10px 18px;background:#c8f55a;color:#0a0a0a;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;height:40px}
+.btn-send:hover{background:#d4f870}
+.btn-send:disabled{background:#1a1a1a;color:#333;cursor:not-allowed}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 24px 16px}
+.chip{font-size:12px;color:#444;border:1px solid #1e1e1e;border-radius:20px;padding:5px 12px;cursor:pointer;transition:all 0.2s;font-family:'DM Mono',monospace}
+.chip:hover{color:#c8f55a;border-color:#2a3a10}
+
+.cta-section{padding:100px 0;text-align:center}
+.cta-section h2{font-family:'DM Serif Display',serif;font-size:clamp(32px,5vw,52px);letter-spacing:-1.5px;margin-bottom:20px;line-height:1.1}
+.cta-section h2 em{font-style:italic;color:#c8f55a}
+.cta-section p{font-size:16px;color:#555;margin-bottom:40px;font-weight:300}
+
+footer{border-top:1px solid #111;padding:28px 0;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:'DM Serif Display',serif;font-size:20px}
+.footer-tagline{font-family:'DM Mono',monospace;font-size:10px;color:#3a5a10;letter-spacing:0.08em;text-transform:uppercase;margin-top:6px}
+.footer
+.footer-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;max-width:420px}
+.footer-copy{font-family:'DM Mono',monospace;font-size:11px;color:#2a2a2a;letter-spacing:0.05em}
+.footer-disclaimer{font-family:'DM Mono',monospace;font-size:10px;color:#222;text-align:right;line-height:1.6}
+.footer-quant{font-family:'DM Mono',monospace;font-size:10px;color:#2a3a10;text-align:right;line-height:1.6;border-top:1px solid #1a1a1a;padding-top:8px;margin-top:4px}
+
+@media(max-width:600px){.modules{grid-template-columns:1fr}.pricing{grid-template-columns:1fr}.modal-row{grid-template-columns:1fr}.modal-metrics{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<!-- MODAL MÓDULO 1 -->
+<div class="modal-overlay" id="modal1">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal1')">✕</button>
+    <div class="modal-tag" data-i18n="mod1_tag"></div>
+    <h3 data-i18n="mod1_title"></h3>
+    <p class="modal-desc" data-i18n="mod1_desc"></p>
+    <div class="modal-fields">
+      <div class="modal-field">
+        <label data-i18n="field_event"></label>
+        <input type="text" id="m1-evento" data-i18n-placeholder="ph_event" />
+      </div>
+      <div class="modal-field">
+        <label data-i18n="field_market"></label>
+        <input type="text" id="m1-mercado" data-i18n-placeholder="ph_market" />
+      </div>
+      <div class="modal-row">
+        <div class="modal-field">
+          <label data-i18n="field_odd"></label>
+          <input type="number" id="m1-odd" placeholder="2.10" step="0.01" min="1" />
+        </div>
+        <div class="modal-field">
+          <label data-i18n="field_sport"></label>
+          <select id="m1-esporte">
+            <option value="futebol" data-i18n="sport_football"></option>
+            <option value="basquete" data-i18n="sport_basketball"></option>
+            <option value="tenis" data-i18n="sport_tennis"></option>
+            <option value="mma">MMA / UFC</option>
+            <option value="outro" data-i18n="sport_other"></option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-field">
+        <label data-i18n="field_context"></label>
+        <textarea id="m1-contexto" rows="2" data-i18n-placeholder="ph_context"></textarea>
+      </div>
+    </div>
+    <button class="modal-btn" id="m1-btn" onclick="analisarAposta()"><span data-i18n="btn_analyse"></span></button>
+    <div class="modal-loading" id="m1-loading"><div class="spinner"></div><br><span data-i18n="loading_text"></span></div>
+    <div class="modal-result" id="m1-result">
+      <div class="modal-result-header">
+        <div class="modal-result-title">Calibra</div>
+        <div class="ev-badge" id="m1-ev-badge">—</div>
+      </div>
+      <div class="modal-metrics">
+        <div class="modal-metric"><div class="modal-metric-label" data-i18n="metric_implied"></div><div class="modal-metric-value" id="m1-prob-imp">—</div></div>
+        <div class="modal-metric"><div class="modal-metric-label" data-i18n="metric_estimated"></div><div class="modal-metric-value green" id="m1-prob-est">—</div></div>
+        <div class="modal-metric"><div class="modal-metric-label" data-i18n="metric_ev"></div><div class="modal-metric-value" id="m1-ev-val">—</div></div>
+      </div>
+      <div class="modal-text" id="m1-text"></div>
+      <div class="modal-divider"></div>
+      <div class="modal-text" id="m1-sizing"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MÓDULO 2 -->
+<div class="modal-overlay" id="modal2">
+  <div class="modal premium">
+    <button class="modal-close" onclick="closeModal('modal2')">✕</button>
+    <div class="modal-tag" data-i18n="mod2_tag"></div>
+    <h3 data-i18n="mod2_title"></h3>
+    <p class="modal-desc" data-i18n="mod2_desc"></p>
+    <div class="scanner-suggestions" id="scanner-sugs"></div>
+    <div class="scanner-prompt-wrap">
+      <div class="scanner-prompt-label" data-i18n="scanner_label"></div>
+      <textarea id="m2-prompt" rows="3" data-i18n-placeholder="scanner_ph"></textarea>
+    </div>
+    <button class="modal-btn" id="m2-btn" onclick="runScanner()" style="background:#c8f55a"><span data-i18n="btn_scan"></span></button>
+    <div class="modal-loading" id="m2-loading"><div class="spinner"></div><br><span data-i18n="scanning_text"></span></div>
+    <div class="opp-list" id="m2-results"></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav>
+    <div class="logo">Calibra</div>
+    <div class="nav-right">
+      <span class="lang-auto-badge" id="auto-badge">auto</span>
+      <select class="lang-select" id="lang-select" onchange="setLang(this.value,true)">
+        <option value="pt">🇧🇷 PT</option>
+        <option value="en">🇺🇸 EN</option>
+        <option value="es">🇪🇸 ES</option>
+        <option value="fr">🇫🇷 FR</option>
+        <option value="de">🇩🇪 DE</option>
+        <option value="it">🇮🇹 IT</option>
+      </select>
+      <button class="btn-nav" data-i18n="nav_cta"></button>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <h1 data-i18n="hero_h1"></h1>
+    <div class="hero-tag" data-i18n="hero_tag"></div>
+    <p class="hero-sub" data-i18n="hero_sub"></p>
+    <div class="hero-ctas">
+      <button class="btn-primary" onclick="openModal('modal1')" data-i18n="hero_cta1"></button>
+      <button class="btn-ghost" onclick="openModal('modal2')" data-i18n="hero_cta2"></button>
+    </div>
+    <div class="hero-note" data-i18n="hero_note"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-tag" data-i18n="s_product_tag"></div>
+    <h2 data-i18n="s_product_h2"></h2>
+    <p class="section-sub" data-i18n="s_product_sub"></p>
+    <div class="modules">
+      <div class="module" onclick="openModal('modal1')">
+        <div class="module-tag" data-i18n="mod1_tag"></div>
+        <div class="module-icon">◎</div>
+        <h3 data-i18n="mod1_title"></h3>
+        <p data-i18n="mod1_desc"></p>
+        <div class="module-note"><strong data-i18n="multiples_label"></strong> <span data-i18n="mod1_note"></span></div>
+        <div class="module-cta">→ <span data-i18n="module_cta1"></span></div>
+      </div>
+      <div class="module premium" onclick="openModal('modal2')">
+        <div class="module-tag" data-i18n="mod2_tag"></div>
+        <div class="module-badge" data-i18n="premium_label"></div>
+        <div class="module-icon">⬡</div>
+        <h3 data-i18n="mod2_title"></h3>
+        <p data-i18n="mod2_desc"></p>
+        <div class="module-note" style="color:#2a4a10"><strong style="color:#3a6010" data-i18n="multiples_label"></strong> <span data-i18n="mod2_note"></span></div>
+        <div class="module-cta">→ <span data-i18n="module_cta2"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-tag" data-i18n="s_plans_tag"></div>
+    <h2 data-i18n="s_plans_h2"></h2>
+    <p class="section-sub" data-i18n="s_plans_sub"></p>
+    <div class="pricing">
+      <div class="plan">
+        <div class="plan-label">Free</div>
+        <div class="plan-price"><span class="amount" id="price-free"></span><span class="period" data-i18n="period_forever"></span></div>
+        <p class="plan-desc" data-i18n="plan_free_desc"></p>
+        <ul class="plan-features">
+          <li><span class="feat-dot"></span><span data-i18n="f_free1"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_free2"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_free3"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_free4"></span></li>
+        </ul>
+        <button class="btn-plan" onclick="openModal('modal1')" data-i18n="btn_free"></button>
+      </div>
+      <div class="plan featured">
+        <div class="popular-tag" data-i18n="popular_tag"></div>
+        <div class="plan-label">Pro</div>
+        <div class="plan-price"><span class="amount" id="price-pro"></span><span class="period" data-i18n="period_month"></span></div>
+        <p class="plan-desc" data-i18n="plan_pro_desc"></p>
+        <ul class="plan-features">
+          <li><span class="feat-dot"></span><span data-i18n="f_pro1"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_pro2"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_pro3"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_pro4"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_pro5"></span></li>
+        </ul>
+        <button class="btn-plan-primary" data-i18n="btn_pro"></button>
+      </div>
+      <div class="plan decoy">
+        <div class="plan-label">Elite</div>
+        <div class="plan-price"><span class="amount" id="price-elite"></span><span class="period" data-i18n="period_month"></span></div>
+        <p class="plan-desc" data-i18n="plan_elite_desc"></p>
+        <ul class="plan-features">
+          <li><span class="feat-dot"></span><span data-i18n="f_elite1"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_elite2"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_elite3"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_elite4"></span></li>
+          <li><span class="feat-dot"></span><span data-i18n="f_elite5"></span></li>
+        </ul>
+        <button class="btn-plan-gold" data-i18n="btn_elite"></button>
+      </div>
+    </div>
+    <div class="cancel-note" data-i18n="cancel_note"></div>
+    <div class="fomo-box">
+      <div class="fomo-icon">◎</div>
+      <div class="fomo-text" data-i18n="fomo_text"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-tag" data-i18n="s_support_tag"></div>
+    <h2 data-i18n="s_support_h2"></h2>
+    <p class="section-sub" data-i18n="s_support_sub"></p>
+    <div class="support-box">
+      <div class="support-header">
+        <div class="support-dot"></div>
+        <div class="support-title">Calibra Support</div>
+        <div class="support-status" data-i18n="support_status"></div>
+      </div>
+      <div class="chat-area" id="chat-area">
+        <div class="msg ai" id="initial-msg"></div>
+      </div>
+      <div class="typing" id="typing"><div class="dot-anim"><div></div><div></div><div></div></div><span data-i18n="typing_text"></span></div>
+      <div class="chips" id="chips">
+        <div class="chip" id="chip1" onclick="sendChipKey('chip1_q')"></div>
+        <div class="chip" id="chip2" onclick="sendChipKey('chip2_q')"></div>
+        <div class="chip" id="chip3" onclick="sendChipKey('chip3_q')"></div>
+        <div class="chip" id="chip4" onclick="sendChipKey('chip4_q')"></div>
+      </div>
+      <div class="support-input-wrap">
+        <textarea class="support-input" id="support-input" rows="1" onkeydown="handleKey(event)"></textarea>
+        <button class="btn-send" id="btn-send" onclick="sendMessage()" data-i18n="btn_send"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-section">
+    <h2 data-i18n="cta_h2"></h2>
+    <p data-i18n="cta_sub"></p>
+    <button class="btn-primary" onclick="openModal('modal1')" data-i18n="cta_btn"></button>
+  </div>
+
+  <footer>
+    <div class="footer-logo">Calibra</div>
+    <div class="footer-tagline" data-i18n="hero_tag"></div>
+    <div class="footer-right">
+      <div class="footer-copy" data-i18n="footer_copy"></div>
+      <div class="footer-disclaimer" data-i18n="footer_disclaimer"></div>
+      <div class="footer-quant" data-i18n="footer_quant"></div>
+    </div>
+  </footer>
+</div>
+
+<script>
+const i18n={
+pt:{nav_cta:"Começar grátis",hero_tag:"Análise quantitativa de apostas",hero_h1:`Para de apostar<br>no <em>feeling.</em><br><span class="muted">Aposta no edge.</span>`,hero_sub:"Calibra analisa qualquer aposta esportiva e diz se existe EV positivo — antes de tu colocares o dinheiro.",hero_cta1:"Analisar aposta →",hero_cta2:"Scanner de EV",hero_note:"3 análises gratuitas por mês · sem cartão",s_product_tag:"O produto",s_product_h2:`Dois módulos.<br><em>Um objetivo.</em>`,s_product_sub:"Identifica onde o mercado erra — e aproveita antes dos outros.",mod1_tag:"Módulo 01 · Disponível no free",mod1_title:"Analisar aposta",mod1_desc:"Cola o evento, mercado e odd. A IA estima a probabilidade real, calcula o EV e diz quanto alocar.",multiples_label:"Múltiplas:",mod1_note:"cada perna é analisada individualmente — uma com EV negativo contamina toda a múltipla.",mod2_tag:"Módulo 02 · Pro e Elite",premium_label:"Premium",mod2_title:"Scanner de EV",mod2_desc:"Escreves o que buscas em linguagem livre. A IA varre os mercados e retorna oportunidades com edge positivo.",mod2_note:"o scanner identifica pernas com EV positivo — tu montas, nós validamos cada uma.",module_cta1:"Analisar agora",module_cta2:"Escanear mercados",field_event:"Evento",field_market:"Mercado / Aposta",field_odd:"Odd decimal",field_sport:"Esporte",field_context:"Contexto adicional (opcional)",ph_event:"ex: Real Madrid vs Barcelona",ph_market:"ex: Real Madrid vence, Over 2.5",ph_context:"Lesões, forma recente, h2h...",sport_football:"Futebol",sport_basketball:"Basquete / NBA",sport_tennis:"Tênis",sport_other:"Outro",btn_analyse:"Analisar EV →",loading_text:"Calibrando probabilidades...",scanning_text:"Escaneando mercados...",metric_implied:"Prob. implícita",metric_estimated:"Prob. estimada",metric_ev:"EV esperado",scanner_label:"O que estás buscando hoje?",scanner_ph:"ex: Quero edges em futebol europeu hoje...",btn_scan:"Escanear →",scanner_sugs:["futebol europeu hoje","NBA esta semana","Champions League","UFC fim de semana"],s_plans_tag:"Planos",s_plans_h2:`Começa grátis.<br><em>Escala quando quiseres.</em>`,s_plans_sub:"O limite do free existe para sentires a diferença.",period_forever:"/ sempre",period_month:"/ mês",plan_free_desc:"Para conhecer o produto.",f_free1:"3 análises por mês",f_free2:"Módulo 1 completo",f_free3:"EV + sizing incluídos",f_free4:"Scanner não incluso",btn_free:"Começar grátis",popular_tag:"mais popular",plan_pro_desc:"Para quem aposta com frequência.",f_pro1:"Análises ilimitadas",f_pro2:"Scanner de EV — 10 scans/mês",f_pro3:"Múltiplas — análise por perna",f_pro4:"Sizing via Half-Kelly",f_pro5:"Todos os esportes",btn_pro:"Assinar Pro →",plan_elite_desc:"Para bancas maiores.",f_elite1:"Tudo do Pro",f_elite2:"Scanner ilimitado",f_elite3:"Acesso a novos mercados",f_elite4:"Resposta prioritária",f_elite5:"Resumo semanal das melhores oportunidades",btn_elite:"Assinar Elite",cancel_note:"Cancela quando quiseres · sem fidelidade · sem taxa",fomo_text:"Utilizadores Free esgotam o limite em <strong>5 dias.</strong> Quem aposta mais de uma vez por semana sente a diferença.",s_support_tag:"Suporte",s_support_h2:`Dúvidas?<br><em>Pergunta agora.</em>`,s_support_sub:"Suporte inteligente disponível 24h.",support_status:"online agora",typing_text:"a responder...",btn_send:"Enviar",support_init:"Olá. Sou o suporte do <strong>Calibra</strong>. Pergunta o que quiseres sobre o produto, EV, múltiplas ou planos.",support_placeholder:"Escreve a tua dúvida...",chip1:"O que é EV?",chip2:"Múltiplas",chip3:"Qual plano?",chip4:"Garante lucro?",chip1_q:"O que é EV e por que importa?",chip2_q:"Como funcionam as múltiplas no Calibra?",chip3_q:"Qual plano devo escolher?",chip4_q:"O Calibra garante lucro?",cta_h2:`Para de deixar<br><em>dinheiro na mesa.</em>`,cta_sub:"Começa com 3 análises gratuitas. Sem cartão.",cta_btn:"Analisar minha primeira aposta →",footer_copy:"© 2026 · usecalibra.io",footer_disclaimer:"O Calibra é uma ferramenta de análise estatística. Não garantimos lucros nem nos responsabilizamos por perdas. Aposte com responsabilidade.",footer_quant:"Calibra não é recomendação financeira. É otimização de análises quantitativas em mercados de previsão.",ev_pos:"EV Positivo ↑",ev_neg:"EV Negativo ↓",ev_neu:"EV Neutro →",prices:{free:"R$0",pro:"R$29",elite:"R$79"}},
+en:{nav_cta:"Start free",hero_tag:"Quantitative sports betting analysis",hero_h1:`Stop betting on<br><em>gut feeling.</em><br><span class="muted">Bet on edge.</span>`,hero_sub:"Calibra analyses any sports bet and tells you if there's positive EV — before you put your money in.",hero_cta1:"Analyse a bet →",hero_cta2:"EV Scanner",hero_note:"3 free analyses per month · no card",s_product_tag:"The product",s_product_h2:`Two modules.<br><em>One goal.</em>`,s_product_sub:"Find where the market is wrong — and act before anyone else.",mod1_tag:"Module 01 · Available on free",mod1_title:"Analyse a bet",mod1_desc:"Enter event, market and odds. AI estimates real probability, calculates EV and recommends stake.",multiples_label:"Accumulators:",mod1_note:"each leg is analysed individually — one negative EV leg contaminates the whole bet.",mod2_tag:"Module 02 · Pro & Elite",premium_label:"Premium",mod2_title:"EV Scanner",mod2_desc:"Write what you're looking for. AI scans the markets and returns opportunities with positive edge.",mod2_note:"the scanner finds legs with positive EV — you build the acca, we validate each leg.",module_cta1:"Analyse now",module_cta2:"Scan markets",field_event:"Event",field_market:"Market / Bet",field_odd:"Decimal odds",field_sport:"Sport",field_context:"Additional context (optional)",ph_event:"e.g. Real Madrid vs Barcelona",ph_market:"e.g. Real Madrid win, Over 2.5",ph_context:"Injuries, recent form, h2h...",sport_football:"Football",sport_basketball:"Basketball / NBA",sport_tennis:"Tennis",sport_other:"Other",btn_analyse:"Analyse EV →",loading_text:"Calibrating probabilities...",scanning_text:"Scanning markets...",metric_implied:"Implied prob.",metric_estimated:"Estimated prob.",metric_ev:"Expected EV",scanner_label:"What are you looking for today?",scanner_ph:"e.g. I want edges in European football today...",btn_scan:"Scan →",scanner_sugs:["European football today","NBA this week","Champions League","UFC this weekend"],s_plans_tag:"Plans",s_plans_h2:`Start free.<br><em>Scale when ready.</em>`,s_plans_sub:"The free limit exists so you feel the difference.",period_forever:"/ forever",period_month:"/ month",plan_free_desc:"To discover the product.",f_free1:"3 analyses per month",f_free2:"Full Module 1",f_free3:"EV + sizing included",f_free4:"Scanner not included",btn_free:"Start free",popular_tag:"most popular",plan_pro_desc:"For frequent bettors.",f_pro1:"Unlimited analyses",f_pro2:"EV Scanner — 10 scans/month",f_pro3:"Accumulators — per-leg analysis",f_pro4:"Half-Kelly sizing",f_pro5:"All sports",btn_pro:"Subscribe Pro →",plan_elite_desc:"For larger banks.",f_elite1:"Everything in Pro",f_elite2:"Unlimited scanner",f_elite3:"Early access to new markets",f_elite4:"Priority support",f_elite5:"Weekly summary of best opportunities",btn_elite:"Subscribe Elite",cancel_note:"Cancel anytime · no commitment · no fees",fomo_text:"Free users hit their limit in <strong>5 days.</strong> Anyone betting more than once a week feels the difference.",s_support_tag:"Support",s_support_h2:`Questions?<br><em>Ask now.</em>`,s_support_sub:"AI support available 24h.",support_status:"online now",typing_text:"replying...",btn_send:"Send",support_init:"Hi. I'm Calibra's support. Ask me anything about the product, EV, accumulators or plans.",support_placeholder:"Type your question...",chip1:"What is EV?",chip2:"Accumulators",chip3:"Which plan?",chip4:"Guaranteed profit?",chip1_q:"What is EV and why does it matter?",chip2_q:"How do accumulators work in Calibra?",chip3_q:"Which plan should I choose?",chip4_q:"Does Calibra guarantee profit?",cta_h2:`Stop leaving<br><em>money on the table.</em>`,cta_sub:"Start with 3 free analyses. No card.",cta_btn:"Analyse my first bet →",footer_copy:"© 2026 · usecalibra.io",footer_disclaimer:"Calibra is a statistical analysis tool. We do not guarantee profits or accept liability for losses. Gamble responsibly.",footer_quant:"Calibra is not financial advice. It is quantitative analysis optimisation for prediction markets.",ev_pos:"Positive EV ↑",ev_neg:"Negative EV ↓",ev_neu:"Neutral EV →",prices:{free:"$0",pro:"$7",elite:"$19"}},
+es:{nav_cta:"Empezar gratis",hero_tag:"Análisis cuantitativo de apuestas",hero_h1:`Deja de apostar<br>por <em>intuición.</em><br><span class="muted">Apuesta al edge.</span>`,hero_sub:"Calibra analiza cualquier apuesta y te dice si hay EV positivo — antes de poner tu dinero.",hero_cta1:"Analizar apuesta →",hero_cta2:"Scanner de EV",hero_note:"3 análisis gratuitos al mes · sin tarjeta",s_product_tag:"El producto",s_product_h2:`Dos módulos.<br><em>Un objetivo.</em>`,s_product_sub:"Identifica dónde falla el mercado — y aprovéchalo antes.",mod1_tag:"Módulo 01 · Disponible en free",mod1_title:"Analizar apuesta",mod1_desc:"Pega evento, mercado y cuota. La IA estima probabilidad real, calcula EV y recomienda stake.",multiples_label:"Combinadas:",mod1_note:"cada selección se analiza individualmente — una con EV negativo contamina toda la combinada.",mod2_tag:"Módulo 02 · Pro y Elite",premium_label:"Premium",mod2_title:"Scanner de EV",mod2_desc:"Escribe lo que buscas. La IA escanea mercados y devuelve oportunidades con edge positivo.",mod2_note:"el scanner identifica selecciones con EV positivo — tú construyes, nosotros validamos.",module_cta1:"Analizar ahora",module_cta2:"Escanear mercados",field_event:"Evento",field_market:"Mercado / Apuesta",field_odd:"Cuota decimal",field_sport:"Deporte",field_context:"Contexto adicional (opcional)",ph_event:"ej: Real Madrid vs Barcelona",ph_market:"ej: Real Madrid gana, Más de 2.5",ph_context:"Lesiones, forma reciente, h2h...",sport_football:"Fútbol",sport_basketball:"Baloncesto / NBA",sport_tennis:"Tenis",sport_other:"Otro",btn_analyse:"Analizar EV →",loading_text:"Calibrando probabilidades...",scanning_text:"Escaneando mercados...",metric_implied:"Prob. implícita",metric_estimated:"Prob. estimada",metric_ev:"EV esperado",scanner_label:"¿Qué estás buscando hoy?",scanner_ph:"ej: Quiero edges en fútbol europeo hoy...",btn_scan:"Escanear →",scanner_sugs:["fútbol europeo hoy","NBA esta semana","Champions League","UFC este fin de semana"],s_plans_tag:"Planes",s_plans_h2:`Empieza gratis.<br><em>Escala cuando quieras.</em>`,s_plans_sub:"El límite del free existe para que sientas la diferencia.",period_forever:"/ siempre",period_month:"/ mes",plan_free_desc:"Para conocer el producto.",f_free1:"3 análisis al mes",f_free2:"Módulo 1 completo",f_free3:"EV + sizing incluidos",f_free4:"Scanner no incluido",btn_free:"Empezar gratis",popular_tag:"más popular",plan_pro_desc:"Para quien apuesta con frecuencia.",f_pro1:"Análisis ilimitados",f_pro2:"Scanner de EV — 10 scans/mes",f_pro3:"Combinadas — análisis por selección",f_pro4:"Sizing vía Half-Kelly",f_pro5:"Todos los deportes",btn_pro:"Suscribirse Pro →",plan_elite_desc:"Para bancas mayores.",f_elite1:"Todo lo de Pro",f_elite2:"Scanner ilimitado",f_elite3:"Acceso a nuevos mercados",f_elite4:"Respuesta prioritaria",f_elite5:"Resumen semanal de mejores oportunidades",btn_elite:"Suscribirse Elite",cancel_note:"Cancela cuando quieras · sin compromiso · sin comisiones",fomo_text:"Los usuarios Free agotan el límite en <strong>5 días.</strong> Quien apuesta más de una vez por semana siente la diferencia.",s_support_tag:"Soporte",s_support_h2:`¿Dudas?<br><em>Pregunta ahora.</em>`,s_support_sub:"Soporte inteligente 24h.",support_status:"en línea ahora",typing_text:"respondiendo...",btn_send:"Enviar",support_init:"Hola. Soy el soporte de <strong>Calibra</strong>. Pregunta lo que quieras sobre el producto, EV, combinadas o planes.",support_placeholder:"Escribe tu pregunta...",chip1:"¿Qué es el EV?",chip2:"Combinadas",chip3:"¿Qué plan?",chip4:"¿Garantiza beneficio?",chip1_q:"¿Qué es el EV y por qué importa?",chip2_q:"¿Cómo funcionan las combinadas?",chip3_q:"¿Qué plan debería elegir?",chip4_q:"¿Calibra garantiza beneficios?",cta_h2:`Deja de dejar<br><em>dinero sobre la mesa.</em>`,cta_sub:"Empieza con 3 análisis gratuitos. Sin tarjeta.",cta_btn:"Analizar mi primera apuesta →",footer_copy:"© 2026 · usecalibra.io",footer_disclaimer:"Calibra es una herramienta de análisis estadístico. No garantizamos beneficios. Apuesta con responsabilidad.",footer_quant:"Calibra no es asesoramiento financiero. Es optimización de análisis cuantitativo en mercados de predicción.",ev_pos:"EV Positivo ↑",ev_neg:"EV Negativo ↓",ev_neu:"EV Neutro →",prices:{free:"€0",pro:"€7",elite:"€19"}},
+fr:{nav_cta:"Commencer gratuitement",hero_tag:"Analyse quantitative des paris",hero_h1:`Arrête de parier<br>à <em>l'instinct.</em><br><span class="muted">Parie sur l'edge.</span>`,hero_sub:"Calibra analyse n'importe quel pari et te dit s'il y a un EV positif — avant de miser.",hero_cta1:"Analyser un pari →",hero_cta2:"Scanner EV",hero_note:"3 analyses gratuites par mois · sans carte",s_product_tag:"Le produit",s_product_h2:`Deux modules.<br><em>Un objectif.</em>`,s_product_sub:"Identifier où le marché se trompe — et en profiter avant les autres.",mod1_tag:"Module 01 · Disponible en free",mod1_title:"Analyser un pari",mod1_desc:"Colle l'événement, le marché et la cote. L'IA estime la probabilité réelle, calcule l'EV et recommande la mise.",multiples_label:"Combinés:",mod1_note:"chaque sélection est analysée individuellement — une avec EV négatif contamine tout le combiné.",mod2_tag:"Module 02 · Pro et Elite",premium_label:"Premium",mod2_title:"Scanner EV",mod2_desc:"Écris ce que tu cherches. L'IA scanne les marchés et retourne les opportunités avec edge positif.",mod2_note:"le scanner identifie les sélections à EV positif — tu construis, nous validons.",module_cta1:"Analyser maintenant",module_cta2:"Scanner les marchés",field_event:"Événement",field_market:"Marché / Pari",field_odd:"Cote décimale",field_sport:"Sport",field_context:"Contexte additionnel (optionnel)",ph_event:"ex: Real Madrid vs Barcelona",ph_market:"ex: Real Madrid gagne, Plus de 2.5",ph_context:"Blessures, forme récente, h2h...",sport_football:"Football",sport_basketball:"Basketball / NBA",sport_tennis:"Tennis",sport_other:"Autre",btn_analyse:"Analyser EV →",loading_text:"Calibration des probabilités...",scanning_text:"Scan des marchés...",metric_implied:"Prob. implicite",metric_estimated:"Prob. estimée",metric_ev:"EV attendu",scanner_label:"Que cherches-tu aujourd'hui?",scanner_ph:"ex: Je veux des edges en foot européen aujourd'hui...",btn_scan:"Scanner →",scanner_sugs:["foot européen aujourd'hui","NBA cette semaine","Champions League","UFC ce week-end"],s_plans_tag:"Formules",s_plans_h2:`Commence gratuitement.<br><em>Évolue quand tu veux.</em>`,s_plans_sub:"La limite du free existe pour que tu sentes la différence.",period_forever:"/ toujours",period_month:"/ mois",plan_free_desc:"Pour découvrir le produit.",f_free1:"3 analyses par mois",f_free2:"Module 1 complet",f_free3:"EV + sizing inclus",f_free4:"Scanner non inclus",btn_free:"Commencer gratuitement",popular_tag:"le plus populaire",plan_pro_desc:"Pour qui parie fréquemment.",f_pro1:"Analyses illimitées",f_pro2:"Scanner EV — 10 scans/mois",f_pro3:"Combinés — analyse par sélection",f_pro4:"Sizing via Half-Kelly",f_pro5:"Tous les sports",btn_pro:"S'abonner Pro →",plan_elite_desc:"Pour les grosses bankrolls.",f_elite1:"Tout du Pro",f_elite2:"Scanner illimité",f_elite3:"Accès aux nouveaux marchés",f_elite4:"Réponse prioritaire",f_elite5:"Résumé hebdomadaire des meilleures opportunités",btn_elite:"S'abonner Elite",cancel_note:"Annule quand tu veux · sans engagement · sans frais",fomo_text:"Les utilisateurs Free atteignent leur limite en <strong>5 jours.</strong> Ceux qui parient plus d'une fois par semaine sentent vite la différence.",s_support_tag:"Support",s_support_h2:`Des questions?<br><em>Pose-les maintenant.</em>`,s_support_sub:"Support intelligent 24h.",support_status:"en ligne maintenant",typing_text:"en train de répondre...",btn_send:"Envoyer",support_init:"Bonjour. Je suis le support de <strong>Calibra</strong>. Pose toutes tes questions sur le produit, l'EV, les combinés ou les formules.",support_placeholder:"Écris ta question...",chip1:"C'est quoi l'EV?",chip2:"Combinés",chip3:"Quelle formule?",chip4:"Profit garanti?",chip1_q:"C'est quoi l'EV et pourquoi c'est important?",chip2_q:"Comment fonctionnent les combinés?",chip3_q:"Quelle formule choisir?",chip4_q:"Calibra garantit-il des profits?",cta_h2:`Arrête de laisser<br><em>de l'argent sur la table.</em>`,cta_sub:"Commence avec 3 analyses gratuites. Sans carte.",cta_btn:"Analyser mon premier pari →",footer_copy:"© 2026 · usecalibra.io",footer_disclaimer:"Calibra est un outil d'analyse statistique. Nous ne garantissons pas les profits. Jouez de manière responsable.",footer_quant:"Calibra n'est pas un conseil financier. C'est une optimisation d'analyses quantitatives sur les marchés de prédiction.",ev_pos:"EV Positif ↑",ev_neg:"EV Négatif ↓",ev_neu:"EV Neutre →",prices:{free:"€0",pro:"€7",elite:"€19"}},
+de:{nav_cta:"Kostenlos starten",hero_tag:"Quantitative Wettanalyse",hero_h1:`Hör auf,<br>auf <em>Bauchgefühl</em><br><span class="muted">zu setzen.</span>`,hero_sub:"Calibra analysiert jede Sportwette und sagt dir, ob positiver EV besteht — bevor du einsetzt.",hero_cta1:"Wette analysieren →",hero_cta2:"EV-Scanner",hero_note:"3 kostenlose Analysen pro Monat · ohne Karte",s_product_tag:"Das Produkt",s_product_h2:`Zwei Module.<br><em>Ein Ziel.</em>`,s_product_sub:"Herausfinden, wo der Markt irrt — und es vor anderen nutzen.",mod1_tag:"Modul 01 · Im Free-Plan verfügbar",mod1_title:"Wette analysieren",mod1_desc:"Gib Event, Markt und Quote ein. KI schätzt Wahrscheinlichkeit, berechnet EV und empfiehlt Einsatz.",multiples_label:"Kombiwetten:",mod1_note:"jede Auswahl wird einzeln analysiert — eine mit negativem EV kontaminiert die ganze Kombiwette.",mod2_tag:"Modul 02 · Pro & Elite",premium_label:"Premium",mod2_title:"EV-Scanner",mod2_desc:"Schreib was du suchst. KI scannt die Märkte und liefert Chancen mit positivem Edge.",mod2_note:"der Scanner findet Auswahlen mit positivem EV — du baust, wir validieren.",module_cta1:"Jetzt analysieren",module_cta2:"Märkte scannen",field_event:"Event",field_market:"Markt / Wette",field_odd:"Dezimalquote",field_sport:"Sportart",field_context:"Zusätzlicher Kontext (optional)",ph_event:"z.B. Real Madrid vs Barcelona",ph_market:"z.B. Real Madrid gewinnt, Über 2.5",ph_context:"Verletzungen, aktuelle Form, h2h...",sport_football:"Fußball",sport_basketball:"Basketball / NBA",sport_tennis:"Tennis",sport_other:"Andere",btn_analyse:"EV analysieren →",loading_text:"Wahrscheinlichkeiten kalibrieren...",scanning_text:"Märkte scannen...",metric_implied:"Implizite Prob.",metric_estimated:"Geschätzte Prob.",metric_ev:"Erwarteter EV",scanner_label:"Was suchst du heute?",scanner_ph:"z.B. Ich suche Edges im europäischen Fußball heute...",btn_scan:"Scannen →",scanner_sugs:["Europäischer Fußball heute","NBA diese Woche","Champions League","UFC dieses Wochenende"],s_plans_tag:"Tarife",s_plans_h2:`Kostenlos starten.<br><em>Skalieren wann du willst.</em>`,s_plans_sub:"Das Free-Limit zeigt dir den Unterschied.",period_forever:"/ immer",period_month:"/ Monat",plan_free_desc:"Um das Produkt kennenzulernen.",f_free1:"3 Analysen pro Monat",f_free2:"Vollständiges Modul 1",f_free3:"EV + Sizing inklusive",f_free4:"Scanner nicht inklusive",btn_free:"Kostenlos starten",popular_tag:"beliebtester",plan_pro_desc:"Für häufige Wetter.",f_pro1:"Unbegrenzte Analysen",f_pro2:"EV-Scanner — 10 Scans/Monat",f_pro3:"Kombiwetten — Analyse pro Auswahl",f_pro4:"Half-Kelly Sizing",f_pro5:"Alle Sportarten",btn_pro:"Pro abonnieren →",plan_elite_desc:"Für größere Bankrolls.",f_elite1:"Alles aus Pro",f_elite2:"Unbegrenzter Scanner",f_elite3:"Frühzugang zu neuen Märkten",f_elite4:"Prioritätssupport",f_elite5:"Wöchentliche Zusammenfassung der besten Chancen",btn_elite:"Elite abonnieren",cancel_note:"Jederzeit kündbar · keine Bindung · keine Gebühren",fomo_text:"Free-Nutzer erreichen ihr Limit in <strong>5 Tagen.</strong> Wer öfter wettet, spürt den Unterschied sofort.",s_support_tag:"Support",s_support_h2:`Fragen?<br><em>Jetzt fragen.</em>`,s_support_sub:"KI-Support rund um die Uhr.",support_status:"jetzt online",typing_text:"antworte...",btn_send:"Senden",support_init:"Hallo. Ich bin der Support von <strong>Calibra</strong>. Frag mich alles über Produkt, EV, Kombiwetten oder Tarife.",support_placeholder:"Deine Frage...",chip1:"Was ist EV?",chip2:"Kombiwetten",chip3:"Welcher Tarif?",chip4:"Gewinn garantiert?",chip1_q:"Was ist EV und warum ist es wichtig?",chip2_q:"Wie funktionieren Kombiwetten?",chip3_q:"Welchen Tarif soll ich wählen?",chip4_q:"Garantiert Calibra Gewinne?",cta_h2:`Hör auf,<br><em>Geld liegen zu lassen.</em>`,cta_sub:"Starte mit 3 kostenlosen Analysen. Ohne Karte.",cta_btn:"Meine erste Wette analysieren →",footer_copy:"© 2026 · usecalibra.io",footer_disclaimer:"Calibra ist ein statistisches Analysetool. Keine Gewinngarantie. Bitte verantwortungsvoll spielen.",footer_quant:"Calibra ist keine Finanzberatung. Es ist quantitative Analyseoptimierung für Prognosemärkte.",ev_pos:"Positiver EV ↑",ev_neg:"Negativer EV ↓",ev_neu:"Neutraler EV →",prices:{free:"€0",pro:"€7",elite:"€19"}},
+it:{nav_cta:"Inizia gratis",hero_tag:"Analisi quantitativa delle scommesse",hero_h1:`Smettila di scommettere<br>di <em>istinto.</em><br><span class="muted">Scommetti sull'edge.</span>`,hero_sub:"Calibra analizza qualsiasi scommessa e ti dice se c'è EV positivo — prima che tu metta i soldi.",hero_cta1:"Analizza una scommessa →",hero_cta2:"Scanner EV",hero_note:"3 analisi gratuite al mese · senza carta",s_product_tag:"Il prodotto",s_product_h2:`Due moduli.<br><em>Un obiettivo.</em>`,s_product_sub:"Identificare dove il mercato sbaglia — e approfittarne prima degli altri.",mod1_tag:"Modulo 01 · Disponibile nel free",mod1_title:"Analizza scommessa",mod1_desc:"Inserisci evento, mercato e quota. L'IA stima la probabilità reale, calcola l'EV e consiglia la puntata.",multiples_label:"Multiple:",mod1_note:"ogni selezione è analizzata individualmente — una con EV negativo contamina tutta la multipla.",mod2_tag:"Modulo 02 · Pro ed Elite",premium_label:"Premium",mod2_title:"Scanner EV",mod2_desc:"Scrivi cosa cerchi. L'IA scansiona i mercati e restituisce opportunità con edge positivo.",mod2_note:"lo scanner identifica selezioni con EV positivo — tu costruisci, noi validiamo.",module_cta1:"Analizza ora",module_cta2:"Scansiona mercati",field_event:"Evento",field_market:"Mercato / Scommessa",field_odd:"Quota decimale",field_sport:"Sport",field_context:"Contesto aggiuntivo (opzionale)",ph_event:"es: Real Madrid vs Barcelona",ph_market:"es: Real Madrid vince, Oltre 2.5",ph_context:"Infortuni, forma recente, h2h...",sport_football:"Calcio",sport_basketball:"Basket / NBA",sport_tennis:"Tennis",sport_other:"Altro",btn_analyse:"Analizza EV →",loading_text:"Calibrazione probabilità...",scanning_text:"Scansione mercati...",metric_implied:"Prob. implicita",metric_estimated:"Prob. stimata",metric_ev:"EV atteso",scanner_label:"Cosa stai cercando oggi?",scanner_ph:"es: Voglio edges nel calcio europeo oggi...",btn_scan:"Scansiona →",scanner_sugs:["calcio europeo oggi","NBA questa settimana","Champions League","UFC questo weekend"],s_plans_tag:"Piani",s_plans_h2:`Inizia gratis.<br><em>Scala quando vuoi.</em>`,s_plans_sub:"Il limite del free esiste perché tu senta la differenza.",period_forever:"/ sempre",period_month:"/ mese",plan_free_desc:"Per scoprire il prodotto.",f_free1:"3 analisi al mese",f_free2:"Modulo 1 completo",f_free3:"EV + sizing inclusi",f_free4:"Scanner non incluso",btn_free:"Inizia gratis",popular_tag:"più popolare",plan_pro_desc:"Per chi scommette frequentemente.",f_pro1:"Analisi illimitate",f_pro2:"Scanner EV — 10 scans/mese",f_pro3:"Multiple — analisi per selezione",f_pro4:"Sizing via Half-Kelly",f_pro5:"Tutti gli sport",btn_pro:"Abbonati Pro →",plan_elite_desc:"Per bankroll più grandi.",f_elite1:"Tutto del Pro",f_elite2:"Scanner illimitato",f_elite3:"Accesso ai nuovi mercati",f_elite4:"Risposta prioritaria",f_elite5:"Riepilogo settimanale delle migliori opportunità",btn_elite:"Abbonati Elite",cancel_note:"Cancella quando vuoi · senza vincoli · senza commissioni",fomo_text:"Gli utenti Free esauriscono il limite in <strong>5 giorni.</strong> Chi scommette più di una volta a settimana sente subito la differenza.",s_support_tag:"Supporto",s_support_h2:`Domande?<br><em>Chiedi adesso.</em>`,s_support_sub:"Supporto intelligente 24h.",support_status:"online ora",typing_text:"sto rispondendo...",btn_send:"Invia",support_init:"Ciao. Sono il supporto di <strong>Calibra</strong>. Chiedi tutto sul prodotto, EV, multiple o piani.",support_placeholder:"Scrivi la tua domanda...",chip1:"Cos'è l'EV?",chip2:"Multiple",chip3:"Quale piano?",chip4:"Profitto garantito?",chip1_q:"Cos'è l'EV e perché è importante?",chip2_q:"Come funzionano le multiple?",chip3_q:"Quale piano dovrei scegliere?",chip4_q:"Calibra garantisce profitti?",cta_h2:`Smetti di lasciare<br><em>soldi sul tavolo.</em>`,cta_sub:"Inizia con 3 analisi gratuite. Senza carta.",cta_btn:"Analizza la mia prima scommessa →",footer_copy:"© 2026 · usecalibra.io",footer_disclaimer:"Calibra è uno strumento di analisi statistica. Non garantiamo profitti. Scommetti responsabilmente.",footer_quant:"Calibra non è consulenza finanziaria. È ottimizzazione di analisi quantitative nei mercati di previsione.",ev_pos:"EV Positivo ↑",ev_neg:"EV Negativo ↓",ev_neu:"EV Neutro →",prices:{free:"€0",pro:"€7",elite:"€19"}}
+};
+
+const SYSTEM_PROMPT={pt:"Sei o suporte do Calibra Direto, honesto. Free: R$0, 3/mês. Pro: R$29/mês, ilimitado, scanner 10/mês. Elite: R$79/mês, scanner ilimitado + resumo semanal. Múltiplas: 1 crédito/perna. Cancela quando quiser. Sem garantia de lucro. Calibra não é recomendação financeira — é otimização de análises quantitativas. Máx 3 frases, sem markdown.",en:"You are Calibra's support. Direct, honest. Free: $0, 3/month. Pro: $7/month, unlimited, scanner 10/month. Elite: $19/month, unlimited scanner + weekly summary. Accumulators: 1 credit/leg. Cancel anytime. No profit guarantee. Calibra is not financial advice — it is quantitative analysis optimisation. Max 3 sentences, no markdown.",es:"Eres el soporte de Calibra Directo, honesto. Free: €0, 3/mes. Pro: €7/mes, scanner 10/mes. Elite: €19/mes, scanner ilimitado + resumen semanal. No garantía. Calibra no es asesoramiento financiero. Máx 3 frases.",fr:"Tu es le support de Calibra Direct, honnête. Free: €0, 3/mois. Pro: €7/mois, scanner 10/mois. Elite: €19/mois, scanner illimité + résumé hebdo. Pas de garantie. Calibra n'est pas un conseil financier. Max 3 phrases.",de:"Du bist der Support von Calibra Direkt, ehrlich. Free: €0, 3/Monat. Pro: €7/Monat, Scanner 10/Monat. Elite: €19/Monat, unbegrenzter Scanner. Keine Garantie. Calibra ist keine Finanzberatung. Max 3 Sätze.",it:"Sei il supporto di Calibra Diretto, onesto. Free: €0, 3/mese. Pro: €7/mese, scanner 10/mese. Elite: €19/mese, scanner illimitato. Nessuna garanzia. Calibra non è consulenza finanziaria. Max 3 frasi."};
+
+let currentLang='en';
+
+function detectLang(){const nav=navigator.language||'en';const code=nav.toLowerCase().split('-')[0];const map={pt:'pt',en:'en',es:'es',fr:'fr',de:'de',it:'it'};return map[code]||'en';}
+
+function setLang(lang,manual=false){
+  currentLang=lang;
+  if(manual)document.getElementById('auto-badge').style.display='none';
+  const t=i18n[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.getAttribute('data-i18n');if(t[key]!==undefined)el.innerHTML=t[key];});
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const key=el.getAttribute('data-i18n-placeholder');if(t[key])el.placeholder=t[key];});
+  document.querySelectorAll('select option[data-i18n]').forEach(el=>{const key=el.getAttribute('data-i18n');if(t[key])el.textContent=t[key];});
+  document.getElementById('price-free').textContent=t.prices.free;
+  document.getElementById('price-pro').textContent=t.prices.pro;
+  document.getElementById('price-elite').textContent=t.prices.elite;
+  document.getElementById('support-input').placeholder=t.support_placeholder;
+  document.getElementById('chat-area').innerHTML=`<div class="msg ai">${t.support_init}</div>`;
+  document.getElementById('chip1').textContent=t.chip1;
+  document.getElementById('chip2').textContent=t.chip2;
+  document.getElementById('chip3').textContent=t.chip3;
+  document.getElementById('chip4').textContent=t.chip4;
+  document.getElementById('lang-select').value=lang;
+  document.getElementById('chips').style.display='flex';
+  const sugsEl=document.getElementById('scanner-sugs');
+  sugsEl.innerHTML='';
+  (t.scanner_sugs||[]).forEach(s=>{const d=document.createElement('div');d.className='scanner-sug';d.textContent=s;d.onclick=()=>{document.getElementById('m2-prompt').value=s;};sugsEl.appendChild(d);});
 }
+
+function openModal(id){document.getElementById(id).classList.add('visible');document.body.style.overflow='hidden';}
+function closeModal(id){document.getElementById(id).classList.remove('visible');document.body.style.overflow='';}
+document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)closeModal(el.id);}));
+
+async function analisarAposta(){
+  const evento=document.getElementById('m1-evento').value.trim();
+  const mercado=document.getElementById('m1-mercado').value.trim();
+  const odd=parseFloat(document.getElementById('m1-odd').value);
+  const esporte=document.getElementById('m1-esporte').value;
+  const contexto=document.getElementById('m1-contexto').value.trim();
+  if(!evento||!mercado||!odd||odd<1)return;
+  const btn=document.getElementById('m1-btn');
+  btn.disabled=true;
+  document.getElementById('m1-loading').classList.add('visible');
+  document.getElementById('m1-result').classList.remove('visible');
+  const probImplicita=(1/odd*100).toFixed(1);
+  const t=i18n[currentLang];
+  const prompt=`You are a quantitative sports betting analyst. Analyse this bet rigorously.
+EVENT: ${evento}
+MARKET: ${mercado}
+SPORT: ${esporte}
+DECIMAL ODDS: ${odd}
+IMPLIED PROBABILITY: ${probImplicita}%
+CONTEXT: ${contexto||'None'}
+Respond ONLY in valid JSON, no markdown:
+{"prob_estimada":number,"ev_percentual":number,"veredicto":"POSITIVO"|"NEGATIVO"|"NEUTRO","analise":"3-4 sentences on key probability factors","sizing":"1-2 sentences on Half-Kelly stake recommendation (max 5% for positive EV, 0% for negative)","riscos":"1-2 sentences on main risks"}`;
+  try{
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const text=data.content.map(i=>i.text||'').join('');
+    const r=JSON.parse(text.replace(/```json|```/g,'').trim());
+    const badge=document.getElementById('m1-ev-badge');
+    const evVal=document.getElementById('m1-ev-val');
+    badge.className='ev-badge';
+    if(r.veredicto==='POSITIVO'){badge.classList.add('ev-pos');badge.textContent=t.ev_pos;evVal.className='modal-metric-value green';}
+    else if(r.veredicto==='NEGATIVO'){badge.classList.add('ev-neg');badge.textContent=t.ev_neg;evVal.className='modal-metric-value red';}
+    else{badge.classList.add('ev-neu');badge.textContent=t.ev_neu;evVal.className='modal-metric-value';}
+    document.getElementById('m1-prob-imp').textContent=probImplicita+'%';
+    document.getElementById('m1-prob-est').textContent=r.prob_estimada.toFixed(1)+'%';
+    evVal.textContent=(r.ev_percentual>=0?'+':'')+r.ev_percentual.toFixed(1)+'%';
+    document.getElementById('m1-text').innerHTML=`<strong>${t.metric_ev}:</strong> ${r.analise}<br><br><strong>Riscos:</strong> ${r.riscos}`;
+    document.getElementById('m1-sizing').innerHTML=`<strong>Sizing:</strong> ${r.sizing}`;
+    document.getElementById('m1-result').classList.add('visible');
+  }catch(e){console.error(e);}
+  finally{btn.disabled=false;document.getElementById('m1-loading').classList.remove('visible');}
+}
+
+async function runScanner(){
+  const prompt=document.getElementById('m2-prompt').value.trim();
+  if(!prompt)return;
+  const btn=document.getElementById('m2-btn');
+  btn.disabled=true;
+  document.getElementById('m2-loading').classList.add('visible');
+  document.getElementById('m2-results').innerHTML='';
+  const apiPrompt=`You are an elite sports betting EV scanner. User request: "${prompt}"
+Find 3 realistic positive EV opportunities for May 2026. Order by edge descending. First is best.
+Respond ONLY in valid JSON array, no markdown:
+[{"evento":"Team A vs Team B","competicao":"League","mercado":"bet description","odd_mercado":number,"prob_estimada":number,"edge":number,"confianca":"ALTA"|"MEDIA"|"BAIXA","resumo":"2 sentences explaining the edge","top":true/false}]`;
+  try{
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:apiPrompt}]})});
+    const data=await res.json();
+    const text=data.content.map(i=>i.text||'').join('');
+    const opps=JSON.parse(text.replace(/```json|```/g,'').trim());
+    const container=document.getElementById('m2-results');
+    opps.forEach(opp=>{
+      const confClass=opp.confianca==='ALTA'?'conf-alta':opp.confianca==='MEDIA'?'conf-media':'conf-baixa';
+      const div=document.createElement('div');
+      div.className=opp.top?'opp-card top':'opp-card';
+      div.innerHTML=`${opp.top?'<div class="opp-top-label">↑ best opportunity</div>':''}<div class="opp-header"><div><div class="opp-event">${opp.evento}</div><div class="opp-sub">${opp.competicao} · ${opp.mercado}</div></div><div class="opp-edge">+${opp.edge.toFixed(1)}%</div></div><div class="opp-resumo">${opp.resumo}</div><div class="opp-details"><span><strong>Odd:</strong> ${opp.odd_mercado}</span><span><strong>Prob:</strong> ${opp.prob_estimada.toFixed(0)}%</span><span class="${confClass}"><strong>Conf:</strong> ${opp.confianca}</span></div>`;
+      container.appendChild(div);
+    });
+  }catch(e){console.error(e);}
+  finally{btn.disabled=false;document.getElementById('m2-loading').classList.remove('visible');}
+}
+
+function sendChipKey(key){document.getElementById('support-input').value=i18n[currentLang][key];sendMessage();}
+async function sendMessage(){
+  const input=document.getElementById('support-input');
+  const text=input.value.trim();
+  if(!text)return;
+  addMessage(text,'user');input.value='';
+  document.getElementById('chips').style.display='none';
+  const btn=document.getElementById('btn-send');btn.disabled=true;
+  document.getElementById('typing').classList.add('visible');scrollChat();
+  try{
+    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT[currentLang]||SYSTEM_PROMPT.en,messages:[{role:'user',content:text}]})});
+    const data=await res.json();
+    const reply=data.content.map(i=>i.text||'').join('');
+    document.getElementById('typing').classList.remove('visible');
+    addMessage(reply,'ai');
+  }catch{document.getElementById('typing').classList.remove('visible');addMessage('Error.','ai');}
+  finally{btn.disabled=false;scrollChat();}
+}
+function addMessage(text,type){const area=document.getElementById('chat-area');const div=document.createElement('div');div.className=`msg ${type}`;div.textContent=text;area.appendChild(div);scrollChat();}
+function scrollChat(){document.getElementById('chat-area').scrollTop=9999;}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+setLang(detectLang());
+</script>
+</body>
+</html>
